@@ -1,12 +1,13 @@
 CXX      := g++
 CC       := gcc
-CXXFLAGS := -std=c++17 -Wall -Wextra -Iinclude
+CXXFLAGS := -std=c++23 -Wall -Wextra -Iinclude
 CFLAGS   := -Iinclude
 LDFLAGS  := -lGL -lglfw -ldl
 
 SRC_DIR  := src
 OBJ_DIR  := obj
-BIN      := opengl-setup
+DIST_DIR := dist
+BIN      := $(DIST_DIR)/voxel-engine
 
 CPP_SRCS := $(wildcard $(SRC_DIR)/*.cpp)
 C_SRCS   := $(wildcard $(SRC_DIR)/*.c)
@@ -17,7 +18,7 @@ OBJS     := $(CPP_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o) \
 
 all: $(BIN)
 
-$(BIN): $(OBJS)
+$(BIN): $(OBJS) | $(DIST_DIR)
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
@@ -29,5 +30,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
+$(DIST_DIR):
+	mkdir -p $(DIST_DIR)
+
 clean:
-	rm -rf $(OBJ_DIR) $(BIN)
+	rm -rf $(OBJ_DIR) $(DIST_DIR)

@@ -9,9 +9,18 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void process_input(GLFWwindow *window) {
+void process_input(GLFWwindow *window, float &textureAlpha, Shader &ourShader) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+    textureAlpha += 0.01f;
+    ourShader.setFloat("textureAlpha", textureAlpha);
+  }
+  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    textureAlpha -= 0.01f;
+    ourShader.setFloat("textureAlpha", textureAlpha);
   }
 }
 
@@ -129,11 +138,13 @@ int main() {
   ourShader.use();
   ourShader.setInt("texture1", 0);
   ourShader.setInt("texture2", 1);
+  float textureAlpha = 0.2f;
+  ourShader.setFloat("textureAlpha", textureAlpha);
 
   // Render loop
   while (!glfwWindowShouldClose(window)) {
     // Input
-    process_input(window);
+    process_input(window, textureAlpha, ourShader);
     // Rendering starts here
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);

@@ -82,6 +82,10 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
+  // Set uniform for offset
+  ourShader.use();
+  ourShader.setFloat("horizontalOffset", 0.5f);
+
   // Render loop
   while (!glfwWindowShouldClose(window)) {
     // Input

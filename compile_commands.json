@@ -1,0 +1,31 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++23",
+      "-Wall",
+      "-Wextra",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "obj/main.o",
+      "src/main.cpp"
+    ],
+    "directory": "/home/juanpistorius/Documents/development/cpp/voxel-engine",
+    "file": "/home/juanpistorius/Documents/development/cpp/voxel-engine/src/main.cpp",
+    "output": "/home/juanpistorius/Documents/development/cpp/voxel-engine/obj/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "obj/glad.o",
+      "src/glad.c"
+    ],
+    "directory": "/home/juanpistorius/Documents/development/cpp/voxel-engine",
+    "file": "/home/juanpistorius/Documents/development/cpp/voxel-engine/src/glad.c",
+    "output": "/home/juanpistorius/Documents/development/cpp/voxel-engine/obj/glad.o"
+  }
+]

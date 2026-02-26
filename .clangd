@@ -1,0 +1,7 @@
+CompileFlags:
+  Add:
+    - --target=x86_64-redhat-linux-gnu
+    - -isystem/usr/include/c++/15
+    - -isystem/usr/include/c++/15/x86_64-redhat-linux
+    - -x
+    - c++

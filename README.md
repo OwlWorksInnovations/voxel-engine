@@ -1,1 +1,1 @@
-<div style="width:100%;height:0;padding-bottom:80%;position:relative;"><iframe src="https://giphy.com/embed/VfCTBgn518tdHMLbbc" width="100%" height="100%" style="position:absolute" frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div><p><a href="https://giphy.com/gifs/opengl-VfCTBgn518tdHMLbbc">via GIPHY</a></p>
+![Gif of face](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExb3JpYmxscXR0ZTdoYXJ6bnB5bTE3dnQzYXhkZTBsc3Y1dzU0Z2FueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VfCTBgn518tdHMLbbc/giphy.gif)

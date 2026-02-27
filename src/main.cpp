@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "Texture.h"
 #include "stb_image.h"
 #include <GLFW/glfw3.h>
 #include <cstdlib>
@@ -97,43 +98,13 @@ int main() {
   glBindVertexArray(0);
 
   // Set up textures
-  unsigned int texture1, texture2;
-  glGenTextures(1, &texture1);
-  glBindTexture(GL_TEXTURE_2D, texture1);
-  // Set texture wrapping and filtering options
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  // Load and generate the texture
-  int width, height, nrChannels;
-  unsigned char *data = stbi_load("assets/textures/container.jpg", &width,
-                                  &height, &nrChannels, 0);
-  if (data) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  } else {
-    std::cout << "Failed to load texture" << std::endl;
-  }
-  // Free up image
-  stbi_image_free(data);
+  Texture containerTexture("assets/textures/container.jpg", GL_RGB, 0,
+                           GL_REPEAT, GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR,
+                           GL_LINEAR);
 
-  glGenTextures(1, &texture2);
-  glBindTexture(GL_TEXTURE_2D, texture2);
-  stbi_set_flip_vertically_on_load(true);
-  data = stbi_load("assets/textures/awesomeface.png", &width, &height,
-                   &nrChannels, 0);
-  if (data) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
-                 GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  } else {
-    std::cout << "Failed to load texture" << std::endl;
-  }
-  // Free up image
-  stbi_image_free(data);
+  Texture awesomefaceTexture("assets/textures/awesomeface.png", GL_RGBA, 0,
+                             GL_CLAMP_TO_EDGE, GL_REPEAT,
+                             GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR);
 
   ourShader.use();
   ourShader.setInt("texture1", 0);
@@ -152,9 +123,9 @@ int main() {
     // Draw rectangle
     ourShader.use();
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1);
+    glBindTexture(GL_TEXTURE_2D, containerTexture.textureID);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture2);
+    glBindTexture(GL_TEXTURE_2D, awesomefaceTexture.textureID);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

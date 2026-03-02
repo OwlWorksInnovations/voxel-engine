@@ -1,5 +1,8 @@
 #include "Shader.h"
 #include "Texture.h"
+#include "glm/detail/qualifier.hpp"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/ext/vector_float3.hpp"
 #include "stb_image.h"
 #include <GLFW/glfw3.h>
 #include <cstdlib>
@@ -100,13 +103,6 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
-  // Set up transform
-  glm::mat4 trans = glm::mat4(1.0f);
-  trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-  trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-  ourShader.use();
-  ourShader.setMat4("transform", trans);
-
   // Set up textures
   Texture containerTexture("assets/textures/container.jpg", GL_RGB, 0,
                            GL_REPEAT, GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR,
@@ -129,6 +125,14 @@ int main() {
     // Rendering starts here
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    // Set up transform
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+    trans =
+        glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+    ourShader.use();
+    ourShader.setMat4("transform", trans);
 
     // Draw rectangle
     ourShader.use();

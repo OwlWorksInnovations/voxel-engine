@@ -3,8 +3,10 @@
 #include "glm/detail/qualifier.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "glm/trigonometric.hpp"
 #include "stb_image.h"
 #include <GLFW/glfw3.h>
+#include <complex>
 #include <cstdlib>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -59,19 +61,215 @@ int main() {
 
   // Set up shaders
   Shader ourShader("shader.vs", "shader.fs");
-
-  // Triangle
   float vertices[] = {
       // positions          // colors           // texture coords
-      0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-      0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-      -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
+      // Front face
+      -0.5f,
+      -0.5f,
+      0.5f,
+      1.0f,
+      0.0f,
+      0.0f,
+      0.0f,
+      0.0f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      1.0f,
+      0.0f,
+      0.0f,
+      1.0f,
+      0.0f,
+      0.5f,
+      0.5f,
+      0.5f,
+      1.0f,
+      0.0f,
+      0.0f,
+      1.0f,
+      1.0f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      1.0f,
+      0.0f,
+      0.0f,
+      0.0f,
+      1.0f,
+      // Back face
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      0.0f,
+      1.0f,
+      0.0f,
+      0.0f,
+      0.0f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.0f,
+      1.0f,
+      0.0f,
+      1.0f,
+      0.0f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.0f,
+      1.0f,
+      0.0f,
+      1.0f,
+      1.0f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      0.0f,
+      1.0f,
+      0.0f,
+      0.0f,
+      1.0f,
+      // Left face
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      0.0f,
+      0.0f,
+      1.0f,
+      0.0f,
+      0.0f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      0.0f,
+      0.0f,
+      1.0f,
+      1.0f,
+      0.0f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      0.0f,
+      0.0f,
+      1.0f,
+      1.0f,
+      1.0f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      0.0f,
+      0.0f,
+      1.0f,
+      0.0f,
+      1.0f,
+      // Right face
+      0.5f,
+      -0.5f,
+      -0.5f,
+      1.0f,
+      1.0f,
+      0.0f,
+      0.0f,
+      0.0f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      1.0f,
+      1.0f,
+      0.0f,
+      1.0f,
+      0.0f,
+      0.5f,
+      0.5f,
+      0.5f,
+      1.0f,
+      1.0f,
+      0.0f,
+      1.0f,
+      1.0f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      1.0f,
+      1.0f,
+      0.0f,
+      0.0f,
+      1.0f,
+      // Top face
+      -0.5f,
+      0.5f,
+      -0.5f,
+      0.0f,
+      1.0f,
+      1.0f,
+      0.0f,
+      0.0f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      0.0f,
+      1.0f,
+      1.0f,
+      1.0f,
+      0.0f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.0f,
+      1.0f,
+      1.0f,
+      1.0f,
+      1.0f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.0f,
+      1.0f,
+      1.0f,
+      0.0f,
+      1.0f,
+      // Bottom face
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      1.0f,
+      0.0f,
+      1.0f,
+      0.0f,
+      0.0f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      1.0f,
+      0.0f,
+      1.0f,
+      1.0f,
+      0.0f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      1.0f,
+      0.0f,
+      1.0f,
+      1.0f,
+      1.0f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      1.0f,
+      0.0f,
+      1.0f,
+      0.0f,
+      1.0f,
   };
 
   unsigned int indices[] = {
-      0, 1, 2, // 1
-      0, 2, 3, // 2
+      0,  1,  2,  0,  2,  3,  // Front
+      5,  4,  7,  5,  7,  6,  // Back (wound opposite)
+      8,  9,  10, 8,  10, 11, // Left
+      14, 13, 12, 14, 12, 15, // Right (wound opposite)
+      16, 17, 18, 16, 18, 19, // Top
+      21, 20, 23, 21, 23, 22, // Bottom (wound opposite)
   };
 
   // Set up VBO (Vertex Buffer Object), VAO (Vertex Array Object), EBO (Element
@@ -124,9 +322,25 @@ int main() {
     process_input(window, textureAlpha, ourShader);
     // Rendering starts here
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Set up transform
+    // Set up a camera matrix
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f),
+                        glm::vec3(0.5f, 1.0f, 0.0f));
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    glm::mat4 projection;
+    projection =
+        glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+    ourShader.use();
+    ourShader.setMat4("model", model);
+    ourShader.setMat4("view", view);
+    ourShader.setMat4("projection", projection);
+
+    // Set up transform (Not being used atm)
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
     trans =
@@ -141,7 +355,7 @@ int main() {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, awesomefaceTexture.textureID);
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
     // Rendering ends here

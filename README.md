@@ -1,6 +1,6 @@
 # Voxel Engine (OpenGL, C++)
 *giphy downscaled fps and quality*
-![Gif of engine](https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnNmNmFucmw4NjQ1c3JwNHhvZjdqMnAzNWZ1ZWI2b3c0MGN1c2ZzbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/0ek2RpHeZiB8HXVGLf/giphy.gif)
+![Gif of voxel engine](https://media.giphy.com/media/0ek2RpHeZiB8HXVGLf/giphy.gif)
 
 ## How did I learn?
 I followed the getting started tutorial on [LearnOpenGL](https://learnopengl.com/Getting-started/OpenGL). I highly recommend doing the exercises because they seem stupid but you learn so much from them.

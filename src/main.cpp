@@ -18,19 +18,19 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void process_input(GLFWwindow *window, float &textureAlpha, Shader &ourShader) {
+void process_input(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   }
 
-  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-    textureAlpha += 0.01f;
-    ourShader.setFloat("textureAlpha", textureAlpha);
-  }
-  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-    textureAlpha -= 0.01f;
-    ourShader.setFloat("textureAlpha", textureAlpha);
-  }
+  // if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+  //   textureAlpha += 0.01f;
+  //   ourShader.setFloat("textureAlpha", textureAlpha);
+  // }
+  // if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+  //   textureAlpha -= 0.01f;
+  //   ourShader.setFloat("textureAlpha", textureAlpha);
+  // }
 }
 
 int main() {
@@ -234,19 +234,18 @@ int main() {
   glBindVertexArray(0);
 
   // Set up textures
-  Texture grassTexture("assets/textures/grass.jpg", GL_RGB, 0, GL_REPEAT,
-                       GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR);
+  Texture containerTexture("assets/textures/container.jpg", GL_RGB, 0,
+                           GL_REPEAT, GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR,
+                           GL_LINEAR);
 
   ourShader.use();
   ourShader.setInt("texture1", 0);
-  float textureAlpha = 0.2f;
-  ourShader.setFloat("textureAlpha", textureAlpha);
 
   glEnable(GL_DEPTH_TEST);
 
   // Render loop
   while (!glfwWindowShouldClose(window)) {
-    process_input(window, textureAlpha, ourShader);
+    process_input(window);
 
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -261,15 +260,15 @@ int main() {
     ourShader.setMat4("projection", projection);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, grassTexture.textureID);
+    glBindTexture(GL_TEXTURE_2D, containerTexture.textureID);
 
     glBindVertexArray(VAO);
     for (unsigned int i = 0; i < 10; i++) {
       glm::mat4 model = glm::mat4(1.0f);
       model = glm::translate(model, cubePositions[i]);
       float angle = 20.0f * i;
-      model =
-          glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle),
+                          glm::vec3(1.0f, 0.3f, 0.5f));
       ourShader.setMat4("model", model);
 
       glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);

@@ -234,17 +234,11 @@ int main() {
   glBindVertexArray(0);
 
   // Set up textures
-  Texture containerTexture("assets/textures/container.jpg", GL_RGB, 0,
-                           GL_REPEAT, GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR,
-                           GL_LINEAR);
-
-  Texture awesomefaceTexture("assets/textures/awesomeface.png", GL_RGBA, 0,
-                             GL_CLAMP_TO_EDGE, GL_REPEAT,
-                             GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR);
+  Texture grassTexture("assets/textures/grass.jpg", GL_RGB, 0, GL_REPEAT,
+                       GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR);
 
   ourShader.use();
   ourShader.setInt("texture1", 0);
-  ourShader.setInt("texture2", 1);
   float textureAlpha = 0.2f;
   ourShader.setFloat("textureAlpha", textureAlpha);
 
@@ -267,9 +261,7 @@ int main() {
     ourShader.setMat4("projection", projection);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, containerTexture.textureID);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, awesomefaceTexture.textureID);
+    glBindTexture(GL_TEXTURE_2D, grassTexture.textureID);
 
     glBindVertexArray(VAO);
     for (unsigned int i = 0; i < 10; i++) {
@@ -291,6 +283,7 @@ int main() {
   // Cleanup and exit
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
+  glDeleteBuffers(1, &EBO);
   glfwTerminate();
   return 0;
 }

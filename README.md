@@ -3,6 +3,15 @@
 
 *giphy downscaled fps and quality*
 
+## Compile & Run (All in one)
+```
+make && cd dist/ && ./voxel-engine
+```
+
+### Keybinds
+- Movement: WASD
+- Look Around: Mouse
+
 ## How did I learn?
 I followed the getting started tutorial on [LearnOpenGL](https://learnopengl.com/Getting-started/OpenGL). I highly recommend doing the exercises because they seem stupid but you learn so much from them.
 

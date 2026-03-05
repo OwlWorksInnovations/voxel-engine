@@ -1,6 +1,13 @@
 # Voxel Engine (OpenGL, C++)
-![Gif of voxel engine](gif.gif)
 
+## Examples
+
+### Chunks
+![Gif of voxel engine](assets/gif/chunk.gif)
+*giphy downscaled fps and quality*
+
+### Cubes 
+![Gif of voxel engine](assets/gif/cubes.gif)
 *giphy downscaled fps and quality*
 
 ## Compile & Run (All in one)

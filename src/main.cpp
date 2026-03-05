@@ -351,6 +351,11 @@ int main() {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, transform->position);
 
+        // Rotate (using entityID as a unique num)
+        float angle = 20.0f * mesh.entityID;
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle),
+                            glm::vec3(1.0f, 0.3f, 0.5f));
+
         // Set positions in shader
         ourShader.use();
         ourShader.setMat4("model", model);

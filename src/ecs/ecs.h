@@ -28,7 +28,7 @@ public:
     nextID++;
     return nextID;
   }
-  template <typename T> void addComponent(int ID) {}
+  template <typename T> void addComponent(int id) {}
 
   // Add
   void addMeshRenderer(int id, unsigned int VAO, unsigned int textureID) {

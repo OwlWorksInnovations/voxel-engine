@@ -87,11 +87,11 @@ void process_input(GLFWwindow *window) {
 }
 
 int main() {
+  // Create window
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
   GLFWwindow *window = glfwCreateWindow(800, 600, "Voxel Engine", NULL, NULL);
   if (window == NULL) {
     std::cout << "Window failed to create!" << std::endl;
@@ -103,17 +103,18 @@ int main() {
   glfwSetCursorPosCallback(window, mouse_callback);
   glfwSetScrollCallback(window, scroll_callback);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     std::cout << "Failed to initialize GLAD!" << std::endl;
     return -1;
   }
-
+  // Set window size
   glViewport(0, 0, 800, 600);
   glEnable(GL_DEPTH_TEST);
 
+  // Load shaders into shader class
   Shader ourShader("shader.vs", "shader.fs");
 
+  // Cube vertices, indices, and positions
   float vertices[] = {
       // positions        // tex coords
       // Front face
@@ -261,11 +262,13 @@ int main() {
       glm::vec3(1.5f, 0.2f, -1.5f),   glm::vec3(-1.3f, 1.0f, -1.5f),
   };
 
+  // Generate buffer and array objects
   unsigned int VBO, VAO, EBO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &EBO);
 
+  // Bind buffers and upload vertex/index data to the GPU
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -273,27 +276,37 @@ int main() {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
                GL_STATIC_DRAW);
 
+  // Tell the VAO how vertex data is laid out in memory
+  // Attribute 0: position (3 floats)
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
+  // Attribute 2: texture coordinates (2 floats, offset by 3 floats)
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                         (void *)(3 * sizeof(float)));
   glEnableVertexAttribArray(2);
 
+  // Unbind VBO and VAO (EBO stays bound to VAO)
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
+  // Load and create texture
   Texture containerTexture("assets/textures/container.jpg", GL_RGB, 0,
                            GL_REPEAT, GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR,
                            GL_LINEAR);
-
   ourShader.use();
   ourShader.setInt("texture1", 0);
 
+  // Creates entities for every cube
+  // Sets positions for each entity from cubePositions list
   Registry registry;
   for (glm::vec3 cubePos : cubePositions) {
+
+    // Create entity and adds components
     int entityId = registry.createEntity();
     registry.addComponent<Transform>(entityId);
     registry.addMeshRenderer(entityId, VAO, containerTexture.textureID);
+
+    // Set transform positions from the cube positions list
     Transform *transform = registry.getTransform(entityId);
     if (transform != nullptr) {
       transform->position = cubePos;
@@ -303,35 +316,47 @@ int main() {
 
   // Render loop
   while (!glfwWindowShouldClose(window)) {
+
+    // deltaTime
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
+    // Setup
     process_input(window);
-
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Freecam
     ourShader.use();
-
     glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     glm::mat4 projection =
         glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
     ourShader.setMat4("view", view);
     ourShader.setMat4("projection", projection);
 
+    // Set textures
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, containerTexture.textureID);
 
+    // Get meshRender from meshRenderers list using id's
     glBindVertexArray(VAO);
     for (auto &mesh : registry.meshRenderers) {
+
+      // Get transform to set positions
       Transform *transform = registry.getTransform(mesh.entityID);
       if (transform != nullptr) {
+
+        // Move to positions
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, transform->position);
+
+        // Set positions in shader
         ourShader.use();
         ourShader.setMat4("model", model);
       }
+
+      // Draw the cubes
       glBindTexture(GL_TEXTURE_2D, mesh.textureID);
       glBindVertexArray(mesh.VAO);
       glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
@@ -342,6 +367,7 @@ int main() {
     glfwPollEvents();
   }
 
+  // Cleanup
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
   glDeleteBuffers(1, &EBO);

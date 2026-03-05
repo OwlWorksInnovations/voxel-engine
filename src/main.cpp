@@ -1,7 +1,6 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "ecs/ecs.h"
-#include "glm/detail/qualifier.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
 #include "glm/trigonometric.hpp"

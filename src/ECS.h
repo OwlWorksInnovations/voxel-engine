@@ -28,12 +28,12 @@ public:
     nextID++;
     return nextID;
   }
-  template <typename T> void addComponent(int id) {}
+  template <typename T> void addComponent(int ID) {}
 
   // Add
-  void addMeshRenderer(int id, unsigned int VAO, unsigned int textureID) {
+  void addMeshRenderer(int ID, unsigned int VAO, unsigned int textureID) {
     MeshRenderer meshRenderer;
-    meshRenderer.entityID = id;
+    meshRenderer.entityID = ID;
     meshRenderer.VAO = VAO;
     meshRenderer.textureID = textureID;
     meshRenderers.push_back(meshRenderer);
@@ -50,9 +50,9 @@ public:
   }
 };
 
-template <> void Registry::addComponent<Transform>(int id) {
+template <> void Registry::addComponent<Transform>(int ID) {
   Transform transform;
-  transform.entityID = id;
+  transform.entityID = ID;
   transform.position = glm::vec3(0, 0, 0);
   transform.rotation = glm::vec3(0, 0, 0);
   transform.scale = glm::vec3(1, 1, 1);

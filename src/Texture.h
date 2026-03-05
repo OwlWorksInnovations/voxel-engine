@@ -1,5 +1,4 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#pragma once
 
 #include "stb_image.h"
 #include <glad/glad.h>
@@ -36,4 +35,3 @@ public:
 
 private:
 };
-#endif

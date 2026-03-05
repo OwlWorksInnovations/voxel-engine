@@ -1,6 +1,9 @@
 #include "Shader.h"
 #include "Texture.h"
+#include "ecs/ecs.h"
+#include "glm/detail/qualifier.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/fwd.hpp"
 #include "glm/trigonometric.hpp"
 #include "stb_image.h"
 #include <GLFW/glfw3.h>
@@ -39,7 +42,7 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
   }
 
   float xoffset = xpos - lastX;
-  float yoffset = lastY - ypos; // reversed: y goes bottom to top
+  float yoffset = lastY - ypos;
   lastX = xpos;
   lastY = ypos;
 
@@ -286,6 +289,18 @@ int main() {
   ourShader.use();
   ourShader.setInt("texture1", 0);
 
+  Registry registry;
+  for (glm::vec3 cubePos : cubePositions) {
+    int entityId = registry.createEntity();
+    registry.addComponent<Transform>(entityId);
+    registry.addMeshRenderer(entityId, VAO, containerTexture.textureID);
+    Transform *transform = registry.getTransform(entityId);
+    if (transform != nullptr) {
+      transform->position = cubePos;
+      transform->rotation = cubePos;
+    }
+  }
+
   // Render loop
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
@@ -309,13 +324,16 @@ int main() {
     glBindTexture(GL_TEXTURE_2D, containerTexture.textureID);
 
     glBindVertexArray(VAO);
-    for (unsigned int i = 0; i < 10; i++) {
-      glm::mat4 model = glm::mat4(1.0f);
-      model = glm::translate(model, cubePositions[i]);
-      float angle = 20.0f * i;
-      model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle),
-                          glm::vec3(1.0f, 0.3f, 0.5f));
-      ourShader.setMat4("model", model);
+    for (auto &mesh : registry.meshRenderers) {
+      Transform *transform = registry.getTransform(mesh.entityID);
+      if (transform != nullptr) {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, transform->position);
+        ourShader.use();
+        ourShader.setMat4("model", model);
+      }
+      glBindTexture(GL_TEXTURE_2D, mesh.textureID);
+      glBindVertexArray(mesh.VAO);
       glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     }
     glBindVertexArray(0);

@@ -1,10 +1,10 @@
 #pragma once
+#include "Chunk.h"
 #include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
 #include "stb_image_write.h"
 #include <cmath>
 #include <glm/glm.hpp>
-#include <iostream>
 #include <random>
 #include <vector>
 
@@ -22,17 +22,34 @@ public:
   std::vector<float> sampledValues;
   float width;
   float height;
+  float scale;
 
-  void setMapSize(float mapWidth, float mapHeight) {
+  void setMapSize(float mapWidth, float mapHeight, float mapScale) {
     width = mapWidth;
     height = mapHeight;
+    scale = mapScale;
   }
 
   void generatePerlinNoise() {
     fillCorners();
-    for (float x = 0; x < width; x += 0.1) {
-      for (float y = 0; y < height; y += 0.1) {
-        sampledValues.push_back(sample(x, y));
+    for (float x = 0; x < width; x += 1.0) {
+      for (float y = 0; y < height; y += 1.0) {
+        sampledValues.push_back(sample(x / scale, y / scale));
+      }
+    }
+  }
+
+  void generateVoxelData(Chunk &chunk, std::vector<float> &sampledValues,
+                         float maxHeight) {
+    for (int x = 0; x < 16; x++) {
+      for (int z = 0; z < 16; z++) {
+        // Get the noise height for this column
+        int height = (sampledValues[x * 16 + z] + 1.0f) / 2.0f * maxHeight;
+
+        // Fill voxels from bottom up to height
+        for (int y = 0; y < 16; y++) {
+          chunk.voxels[x][y][z] = (y <= height) ? 1 : 0;
+        }
       }
     }
   }
@@ -43,8 +60,8 @@ public:
       unsigned char pixel = (sampledValue + 1.0f) / 2.0f * 255;
       picture.push_back(pixel);
     }
-
-    stbi_write_png(filename, 9, 9, 1, picture.data(), 9);
+    stbi_write_png(filename, (int)width, (int)height, 1, picture.data(),
+                   (int)width);
   }
 
 private:
@@ -52,13 +69,12 @@ private:
 
   void fillCorners() {
     GridCorner corner;
-
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> distrib(-1.0f, 1.0f);
 
-    for (float x = 0; width > x; x++) {
-      for (float y = -1; height > y; y++) {
+    for (float x = 0; x <= width; x++) {
+      for (float y = 0; y <= height; y++) {
         corner.point.x = x;
         corner.point.y = y;
         corner.arrowDirection.x = distrib(gen);
@@ -70,40 +86,33 @@ private:
   }
 
   float sample(float x, float y) {
-    // Get cell locations
-    // Bottom left
     int blCellX = std::floor(x);
     int blCellY = std::floor(y);
-    // Bottom right
     int brCellX = blCellX + 1;
     int brCellY = blCellY;
-    // Top left
     int tlCellX = blCellX;
     int tlCellY = blCellY + 1;
-    // Top Right
     int trCellX = blCellX + 1;
     int trCellY = blCellY + 1;
+    int stride = (int)width + 1;
 
-    // Calculate dot values
-    // Bottom Left
-    GridCorner blCorner = grid.corners[blCellX * 10 + blCellY];
+    GridCorner blCorner = grid.corners[blCellX * stride + blCellY];
     glm::vec2 blToSample = glm::vec2(x, y) - blCorner.point;
     float blDot = glm::dot(blToSample, blCorner.arrowDirection);
-    // Bottom Right
-    GridCorner brCorner = grid.corners[brCellX * 10 + brCellY];
+
+    GridCorner brCorner = grid.corners[brCellX * stride + brCellY];
     glm::vec2 brToSample = glm::vec2(x, y) - brCorner.point;
     float brDot = glm::dot(brToSample, brCorner.arrowDirection);
-    // Top Left
-    GridCorner tlCorner = grid.corners[tlCellX * 10 + tlCellY];
+
+    GridCorner tlCorner = grid.corners[tlCellX * stride + tlCellY];
     glm::vec2 tlToSample = glm::vec2(x, y) - tlCorner.point;
     float tlDot = glm::dot(tlToSample, tlCorner.arrowDirection);
-    // Top Right
-    GridCorner trCorner = grid.corners[trCellX * 10 + trCellY];
+
+    GridCorner trCorner = grid.corners[trCellX * stride + trCellY];
     glm::vec2 trToSample = glm::vec2(x, y) - trCorner.point;
     float trDot = glm::dot(trToSample, trCorner.arrowDirection);
 
-    // Lerp
-    float tx = x - blCellX; // e.g. 0.3 if x = 2.3
+    float tx = x - blCellX;
     float ty = y - blCellY;
 
     float bottom = lerp(blDot, brDot, fade(tx));

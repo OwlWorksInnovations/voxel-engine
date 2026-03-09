@@ -20,7 +20,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 17.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 10.0f, 17.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float yaw = -90.0f;
@@ -130,15 +130,13 @@ int main() {
   ourShader.use();
   ourShader.setInt("texture1", 0);
 
-  // Creates chunk
+  // Perlin noise
   ChunkManager chunkManager;
-  memset(chunkManager.chunk.voxels, 1, sizeof(chunkManager.chunk.voxels));
-  chunkManager.createChunk();
-
-  // Perlin test
   PerlinNoise perlin;
-  perlin.setMapSize(128, 128);
+  perlin.setMapSize(16, 16, 16.0f);
   perlin.generatePerlinNoise();
+  perlin.generateVoxelData(chunkManager.chunk, perlin.sampledValues, 15);
+  chunkManager.createChunk();
   perlin.generateImage("perlinnoise.png");
 
   // Creates entities for every cube

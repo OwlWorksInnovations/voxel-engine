@@ -7,7 +7,7 @@ SRC_DIR  := src
 OBJ_DIR  := obj
 DIST_DIR := dist
 BIN      := $(DIST_DIR)/voxel-engine
-CPP_SRCS := $(wildcard $(SRC_DIR)/*.cpp)
+CPP_SRCS := $(wildcard $(SRC_DIR)/*.cpp) $(wildcard include/imgui/*.cpp)
 C_SRCS   := $(wildcard $(SRC_DIR)/*.c)
 OBJS     := $(CPP_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o) \
             $(C_SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)

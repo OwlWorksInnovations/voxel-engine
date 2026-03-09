@@ -17,6 +17,11 @@
 
 *giphy downscaled fps and quality*
 
+### Game Engine 
+![Gif of voxel engine](assets/gif/gameEngine.gif)
+
+*giphy downscaled fps and quality*
+
 ## Compile & Run (All in one)
 ```
 make && cd dist/ && ./voxel-engine
@@ -38,12 +43,15 @@ make && cd dist/ && ./voxel-engine
 - Collision
 - Multiple block types + texture atlas
 - Lighting (ambient occlusion or basic directional)
-- ImGui Engine interface
-  - Scene hierarchy
-    - Create Entity's
-  - Component inspector
+- ~~ImGui Engine interface~~ (REFER TO IMGUI SECTION BELOW)
+  - ~~Scene hierarchy~~
+    - ~~Create Entity's~~
+  - ~~Component inspector~~
   - Asset browser
   - Play/Stop mode
+
+## IMGUI
+Currently with the imgui interface being implemented it starting to look like a game engine. Know I think i will be doing a full engine rewrite and only adding imgui later, not that it was hard but rather that I don't know how I would handle saving engine scenes, exporting the game to a executable with custom player scripts, and etc. Also I learned quite a bit on how abstraction works and that has lead me to first wanting to be able to make a game using this engine without any UI then in the future implementing the UI. But who knows everything might change and I might just learn fast enough to want to implement the UI before.
 
 ## How did I learn?
 I followed the getting started tutorial on [LearnOpenGL](https://learnopengl.com/Getting-started/OpenGL). I highly recommend doing the exercises because they seem stupid but you learn so much from them.

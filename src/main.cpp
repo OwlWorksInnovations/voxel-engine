@@ -1,5 +1,6 @@
 #include "Chunk.h"
 #include "ECS.h"
+#include "Perlin.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "glm/ext/matrix_transform.hpp"
@@ -133,6 +134,10 @@ int main() {
   ChunkManager chunkManager;
   memset(chunkManager.chunk.voxels, 1, sizeof(chunkManager.chunk.voxels));
   chunkManager.createChunk();
+
+  // Perlin test
+  PerlinNoise perlin;
+  perlin.generatePerlinNoise();
 
   // Creates entities for every cube
   // Sets positions for each entity from cubePositions list

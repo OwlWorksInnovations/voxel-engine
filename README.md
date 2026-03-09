@@ -12,6 +12,11 @@
 
 *giphy downscaled fps and quality*
 
+### Cubes 
+![Gif of voxel engine](assets/gif/terrainGen.gif)
+
+*giphy downscaled fps and quality*
+
 ## Compile & Run (All in one)
 ```
 make && cd dist/ && ./voxel-engine

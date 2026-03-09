@@ -25,6 +25,7 @@ make && cd dist/ && ./voxel-engine
 ## Progress (More tasks may be added here)
 - ~~ECS (Entity Component System)~~
 - ~~Chunks~~
+- ~~Perlin Noise~~
 - Terrain generation (Perlin noise)
 - Block placing/breaking (runtime voxel modification)
 - Mesh loader (for placing non-voxel models in the scene)

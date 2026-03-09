@@ -12,7 +12,7 @@
 
 *giphy downscaled fps and quality*
 
-### Cubes 
+### Terrain Generation 
 ![Gif of voxel engine](assets/gif/terrainGen.gif)
 
 *giphy downscaled fps and quality*
@@ -31,7 +31,8 @@ make && cd dist/ && ./voxel-engine
 - ~~ECS (Entity Component System)~~
 - ~~Chunks~~
 - ~~Perlin Noise~~
-- Terrain generation (Perlin noise)
+- ~~Terrain generation (Perlin noise)~~
+- Chunk generation (Minecraft-like)
 - Block placing/breaking (runtime voxel modification)
 - Mesh loader (for placing non-voxel models in the scene)
 - Collision

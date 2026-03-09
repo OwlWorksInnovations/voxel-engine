@@ -1,8 +1,10 @@
 #pragma once
 #include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
+#include "stb_image_write.h"
 #include <cmath>
 #include <glm/glm.hpp>
+#include <iostream>
 #include <random>
 #include <vector>
 
@@ -20,11 +22,21 @@ public:
   std::vector<float> sampledValues;
   void generatePerlinNoise() {
     fillCorners();
-    for (int x = 0; x < 9; x++) {
-      for (int y = 0; y < 9; y++) {
+    for (float x = 0; x < 9; x += 0.1) {
+      for (float y = 0; y < 9; y += 0.1) {
         sampledValues.push_back(sample(x, y));
       }
     }
+  }
+
+  void generateImage(const char *filename) {
+    std::vector<unsigned char> picture;
+    for (float sampledValue : sampledValues) {
+      unsigned char pixel = (sampledValue + 1.0f) / 2.0f * 255;
+      picture.push_back(pixel);
+    }
+
+    stbi_write_png(filename, 9, 9, 1, picture.data(), 9);
   }
 
 private:
@@ -35,7 +47,7 @@ private:
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(-1, 1);
+    std::uniform_real_distribution<float> distrib(-1.0f, 1.0f);
 
     for (int x = 0; 10 > x; x++) {
       for (int y = 0; 10 > y; y++) {
@@ -43,6 +55,7 @@ private:
         corner.point.y = y;
         corner.arrowDirection.x = distrib(gen);
         corner.arrowDirection.y = distrib(gen);
+        corner.arrowDirection = glm::normalize(corner.arrowDirection);
         grid.corners.push_back(corner);
       }
     }

@@ -138,6 +138,7 @@ int main() {
   // Perlin test
   PerlinNoise perlin;
   perlin.generatePerlinNoise();
+  perlin.generateImage("perlinnoise.png");
 
   // Creates entities for every cube
   // Sets positions for each entity from cubePositions list

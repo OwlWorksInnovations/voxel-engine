@@ -137,6 +137,7 @@ int main() {
 
   // Perlin test
   PerlinNoise perlin;
+  perlin.setMapSize(128, 128);
   perlin.generatePerlinNoise();
   perlin.generateImage("perlinnoise.png");
 

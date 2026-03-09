@@ -20,10 +20,18 @@ struct Grid {
 class PerlinNoise {
 public:
   std::vector<float> sampledValues;
+  float width;
+  float height;
+
+  void setMapSize(float mapWidth, float mapHeight) {
+    width = mapWidth;
+    height = mapHeight;
+  }
+
   void generatePerlinNoise() {
     fillCorners();
-    for (float x = 0; x < 9; x += 0.1) {
-      for (float y = 0; y < 9; y += 0.1) {
+    for (float x = 0; x < width; x += 0.1) {
+      for (float y = 0; y < height; y += 0.1) {
         sampledValues.push_back(sample(x, y));
       }
     }
@@ -49,8 +57,8 @@ private:
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> distrib(-1.0f, 1.0f);
 
-    for (int x = 0; 10 > x; x++) {
-      for (int y = 0; 10 > y; y++) {
+    for (float x = 0; width > x; x++) {
+      for (float y = -1; height > y; y++) {
         corner.point.x = x;
         corner.point.y = y;
         corner.arrowDirection.x = distrib(gen);

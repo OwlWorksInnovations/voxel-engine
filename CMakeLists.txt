@@ -30,11 +30,13 @@ target_link_libraries(imgui PUBLIC glfw)
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/stb.cpp
+    src/Core/Engine.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     include/
     src/
+    src/Core/
 )
 
 # ─── Link ─────────────────────────────────────────────────────────────────────

@@ -1,7 +1,10 @@
+#include "Core/Engine.hpp"
 #include <iostream>
 
 int main() {
-  std::cout << "Hello World!" << std::endl;
+  Engine::InitWindow(1280, 720, "Voxel Engine");
+  Engine::Run();
+  Engine::Shutdown();
 
   return 0;
 }

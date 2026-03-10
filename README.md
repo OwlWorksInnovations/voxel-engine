@@ -2,13 +2,8 @@
 
 ## Examples
 
-### Chunks
-![Gif of voxel engine](assets/gif/chunk.gif)
-
-*giphy downscaled fps and quality*
-
-### Cubes 
-![Gif of voxel engine](assets/gif/cubes.gif)
+### Game Engine 
+![Gif of voxel engine](assets/gif/gameEngine.gif)
 
 *giphy downscaled fps and quality*
 
@@ -17,8 +12,13 @@
 
 *giphy downscaled fps and quality*
 
-### Game Engine 
-![Gif of voxel engine](assets/gif/gameEngine.gif)
+### Chunks
+![Gif of voxel engine](assets/gif/chunk.gif)
+
+*giphy downscaled fps and quality*
+
+### Cubes 
+![Gif of voxel engine](assets/gif/cubes.gif)
 
 *giphy downscaled fps and quality*
 

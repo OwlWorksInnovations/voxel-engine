@@ -2,9 +2,14 @@
 #include <iostream>
 
 int main() {
-  Engine::InitWindow(1280, 720, "Voxel Engine");
-  Engine::Run();
-  Engine::Shutdown();
+  try {
+    Engine::InitWindow(1280, 720, "Voxel Engine");
+    Engine::Run();
+    Engine::Shutdown();
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
+    return -1;
+  }
 
   return 0;
 }

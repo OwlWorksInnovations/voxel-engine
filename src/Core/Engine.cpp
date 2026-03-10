@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 GLFWwindow *Engine::window = nullptr;
+Shader *Engine::shader = nullptr;
 
 void Engine::InitWindow(int width, int height, const std::string &windowTitle) {
   if (!glfwInit()) {
@@ -24,6 +25,7 @@ void Engine::InitWindow(int width, int height, const std::string &windowTitle) {
     throw std::runtime_error("Failed to initialize GLAD");
   }
 
+  shader = new Shader("shaders/shader.vs", "shaders/shader.fs");
   Input::Init(window);
 }
 
@@ -36,11 +38,14 @@ void Engine::Run() {
     if (Input::IsKeyPressed(GLFW_KEY_ESCAPE))
       glfwSetWindowShouldClose(window, true);
 
+    shader->Use();
+
     glfwSwapBuffers(window);
   }
 }
 
 void Engine::Shutdown() {
+  delete shader;
   glfwDestroyWindow(window);
   glfwTerminate();
 }

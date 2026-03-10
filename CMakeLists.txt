@@ -32,12 +32,14 @@ add_executable(${PROJECT_NAME}
     src/stb.cpp
     src/Core/Engine.cpp
     src/Core/Input.cpp
+    src/Render/Shader.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     include/
     src/
     src/Core/
+    src/Render/
 )
 
 # ─── Link ─────────────────────────────────────────────────────────────────────
@@ -48,13 +50,16 @@ target_link_libraries(${PROJECT_NAME}
     imgui
 )
 
-# ─── Copy assets & shaders to dist ────────────────────────────────────────────
+# ─── Copy assets to dist ──────────────────────────────────────────────────────
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/assets
         ${CMAKE_SOURCE_DIR}/dist/assets
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_SOURCE_DIR}/src/shader.vs
-        ${CMAKE_SOURCE_DIR}/src/shader.fs
-        ${CMAKE_SOURCE_DIR}/dist/
 )
+
+# ─── Auto copy shaders when changed ──────────────────────────────────────────
+file(GLOB_RECURSE SHADER_FILES "src/shaders/*")
+foreach(SHADER ${SHADER_FILES})
+    get_filename_component(SHADER_NAME ${SHADER} NAME)
+    configure_file(${SHADER} ${CMAKE_SOURCE_DIR}/dist/shaders/${SHADER_NAME} COPYONLY)
+endforeach()

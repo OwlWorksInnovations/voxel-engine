@@ -1,1 +1,0 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/voxel-engine.dir/link.d "CMakeFiles/voxel-engine.dir/src/main.cpp.o" "CMakeFiles/voxel-engine.dir/src/stb.cpp.o" -o /home/juanpistorius/Documents/development/cpp/voxel-engine/dist/voxel-engine  libglad.a libimgui.a /usr/lib64/libGLX.so /usr/lib64/libOpenGL.so /usr/lib64/libglfw.so.3.4

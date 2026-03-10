@@ -1,5 +1,0 @@
-/home/juanpistorius/Documents/development/cpp/voxel-engine/build/CMakeFiles/glad.dir
-/home/juanpistorius/Documents/development/cpp/voxel-engine/build/CMakeFiles/imgui.dir
-/home/juanpistorius/Documents/development/cpp/voxel-engine/build/CMakeFiles/voxel-engine.dir
-/home/juanpistorius/Documents/development/cpp/voxel-engine/build/CMakeFiles/edit_cache.dir
-/home/juanpistorius/Documents/development/cpp/voxel-engine/build/CMakeFiles/rebuild_cache.dir

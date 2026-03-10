@@ -1,3 +1,5 @@
-dist
-obj
-.cache
+build/
+dist/
+obj/
+.cache/
+

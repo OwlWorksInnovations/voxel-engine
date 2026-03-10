@@ -27,7 +27,7 @@ int screenHeight = 1080;
 Registry registry;
 
 // Camera
-glm::vec3 cameraPos = glm::vec3(8.0f, 20.0f, 25.0f);
+glm::vec3 cameraPos = glm::vec3(32.0f, 60.0f, 64.0f);
 glm::vec3 cameraFront = glm::normalize(glm::vec3(0.0f, -0.5f, -1.0f));
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float yaw = -90.0f;
@@ -100,7 +100,7 @@ void process_input(GLFWwindow *window) {
   if (!mouseCaptured)
     return;
 
-  float cameraSpeed = 5.0f * deltaTime;
+  float cameraSpeed = 20.0f * deltaTime;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     cameraPos += cameraSpeed * cameraFront;
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -112,7 +112,6 @@ void process_input(GLFWwindow *window) {
     cameraPos +=
         glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 
-  // Wireframe toggle (debounced)
   static bool lastSemicolon = false;
   bool currentSemicolon = glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS;
   if (currentSemicolon && !lastSemicolon)
@@ -121,7 +120,6 @@ void process_input(GLFWwindow *window) {
 }
 
 int main() {
-  // Create window
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -143,56 +141,62 @@ int main() {
     std::cout << "Failed to initialize GLAD!" << std::endl;
     return -1;
   }
-  
+
   glEnable(GL_DEPTH_TEST);
 
-  // Load shaders
   Shader ourShader("shader.vs", "shader.fs");
 
-  // Load and create textures
-  Texture containerTexture("assets/textures/container.jpg", GL_RGB, 0,
-                           GL_REPEAT, GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR,
-                           GL_LINEAR);
-  Texture awesomefaceTexture("assets/textures/awesomeface.png", GL_RGBA, 0,
-                             GL_REPEAT, GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR,
-                             GL_LINEAR);
+  Texture grassTexture("assets/textures/grass.png", GL_RGBA, 0, GL_REPEAT,
+                       GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR);
 
   ourShader.use();
   ourShader.setInt("texture1", 0);
 
-  // Default cube mesh
   Mesh cubeMesh;
   cubeMesh.create(DefaultMeshes::cubeVertices, DefaultMeshes::cubeIndices);
 
-  // Perlin noise terrain
   ChunkManager chunkManager;
   PerlinNoise perlin;
-  float maxHeight = 15.0f;
-  perlin.setMapSize(16, 16, 16.0f);
-  perlin.generatePerlinNoise();
-  perlin.generateVoxelData(chunkManager.chunk, perlin.sampledValues, maxHeight);
-  chunkManager.createChunk();
+  float maxHeight = 40.0f;
 
-  // Create cube entity on top of terrain at (8, 8)
-  int cubeX = 8;
-  int cubeZ = 8;
-  int terrainHeight = (perlin.sampledValues[cubeX * 16 + cubeZ] + 1.0f) / 2.0f * maxHeight;
-  
+  // Initial chunk generation
+  for (int x = -1; x <= 1; x++) {
+    for (int z = -1; z <= 1; z++) {
+      chunkManager.createChunk(x, z, perlin, maxHeight);
+    }
+  }
+
+  // Create cube entity on top of terrain at world (32, 32)
+  int worldX = 32;
+  int worldZ = 32;
+  float n = perlin.getNoise((float)worldX, (float)worldZ);
+  int terrainHeight = (int)(n * maxHeight);
+
   int entityId = registry.createEntity();
   registry.addComponent<Transform>(entityId);
-  Transform* transform = registry.getTransform(entityId);
-  transform->position = glm::vec3(cubeX, terrainHeight + 1.5f, cubeZ);
+  Transform *transform = registry.getTransform(entityId);
+  transform->position = glm::vec3(worldX, terrainHeight + 1.5f, worldZ);
   transform->scale = glm::vec3(1.0f, 1.0f, 1.0f);
-  
-  registry.addMeshRenderer(entityId, cubeMesh.VAO, awesomefaceTexture.textureID);
+  registry.addMeshRenderer(entityId, cubeMesh.VAO, grassTexture.textureID);
 
-  // Render loop
+  int renderDistance = 2;
+
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
     process_input(window);
+
+    // Dynamic chunk generation
+    int playerChunkX = (int)floor(cameraPos.x / 64.0f);
+    int playerChunkZ = (int)floor(cameraPos.z / 64.0f);
+    for (int x = -renderDistance; x <= renderDistance; x++) {
+      for (int z = -renderDistance; z <= renderDistance; z++) {
+        chunkManager.createChunk(playerChunkX + x, playerChunkZ + z, perlin,
+                                 maxHeight);
+      }
+    }
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -206,30 +210,34 @@ int main() {
     glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     glm::mat4 projection = glm::perspective(
         glm::radians(45.0f), (float)screenWidth / (float)screenHeight, 0.1f,
-        100.0f);
+        1000.0f); // Increased far plane
     ourShader.setMat4("view", view);
     ourShader.setMat4("projection", projection);
 
     // Draw chunks
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, containerTexture.textureID);
-    for (Chunk &chunk : chunkManager.chunks) {
+    glBindTexture(GL_TEXTURE_2D, grassTexture.textureID);
+    for (Chunk *chunk : chunkManager.chunks) {
       glm::mat4 model = glm::mat4(1.0f);
       ourShader.setMat4("model", model);
-      glBindVertexArray(chunk.VAO);
-      glDrawElements(GL_TRIANGLES, chunk.indexCount, GL_UNSIGNED_INT, 0);
+      glBindVertexArray(chunk->VAO);
+      glDrawElements(GL_TRIANGLES, chunk->indexCount, GL_UNSIGNED_INT, 0);
     }
 
     // Draw entities
     for (MeshRenderer &mr : registry.meshRenderers) {
       Transform *t = registry.getTransform(mr.entityID);
-      if (!t) continue;
+      if (!t)
+        continue;
 
       glm::mat4 model = glm::mat4(1.0f);
       model = glm::translate(model, t->position);
-      model = glm::rotate(model, glm::radians(t->rotation.x), glm::vec3(1, 0, 0));
-      model = glm::rotate(model, glm::radians(t->rotation.y), glm::vec3(0, 1, 0));
-      model = glm::rotate(model, glm::radians(t->rotation.z), glm::vec3(0, 0, 1));
+      model =
+          glm::rotate(model, glm::radians(t->rotation.x), glm::vec3(1, 0, 0));
+      model =
+          glm::rotate(model, glm::radians(t->rotation.y), glm::vec3(0, 1, 0));
+      model =
+          glm::rotate(model, glm::radians(t->rotation.z), glm::vec3(0, 0, 1));
       model = glm::scale(model, t->scale);
       ourShader.setMat4("model", model);
 

@@ -1,4 +1,6 @@
 #include "Engine.hpp"
+#include "../Render/Mesh.hpp"
+#include "../Render/Shader.hpp"
 #include "Input.hpp"
 #include <GLFW/glfw3.h>
 #include <stdexcept>
@@ -30,15 +32,34 @@ void Engine::InitWindow(int width, int height, const std::string &windowTitle) {
 }
 
 void Engine::Run() {
+  // simple quad
+  std::vector<Vertex> vertices = {
+      {-0.5f, 0.5f, 0.0f, 0.0f, 1.0f},  // top left
+      {0.5f, 0.5f, 0.0f, 1.0f, 1.0f},   // top right
+      {0.5f, -0.5f, 0.0f, 1.0f, 0.0f},  // bottom right
+      {-0.5f, -0.5f, 0.0f, 0.0f, 0.0f}, // bottom left
+  };
+
+  std::vector<unsigned int> indices = {0, 1, 2, 0, 2, 3};
+
+  Mesh mesh;
+  mesh.SetData(vertices, indices);
+
   while (!glfwWindowShouldClose(window)) {
     // Update input before wiping state
     Input::Update();
     glfwPollEvents();
 
+    // Input
     if (Input::IsKeyPressed(GLFW_KEY_ESCAPE))
       glfwSetWindowShouldClose(window, true);
 
+    // Clear screen
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     shader->Use();
+    mesh.Draw();
 
     glfwSwapBuffers(window);
   }

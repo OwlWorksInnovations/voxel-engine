@@ -34,6 +34,8 @@ void Input::KeyCallback(GLFWwindow *window, int key, int scancode, int action,
 
 void Input::MouseButtonCallback(GLFWwindow *window, int button, int action,
                                 int mods) {
+  if (button < 0 || button >= GLFW_MOUSE_BUTTON_LAST)
+    return;
   mouseButtons[button] = (action != GLFW_RELEASE);
 }
 
@@ -50,8 +52,12 @@ bool Input::IsKeyReleased(int key) {
   return !currentKeys[key] && previousKeys[key];
 }
 
-bool Input::IsMouseButtonPressed(int button) { return mouseButtons[button]; }
+bool Input::IsMouseButtonPressed(int button) {
+  if (button < 0 || button >= GLFW_MOUSE_BUTTON_LAST) return false;
+  return mouseButtons[button];
+}
 bool Input::IsMouseButtonJustPressed(int button) {
+  if (button < 0 || button >= GLFW_MOUSE_BUTTON_LAST) return false;
   return mouseButtons[button] && !previousMouseButtons[button];
 }
 double Input::GetMouseX() { return mouseX; }

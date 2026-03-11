@@ -64,6 +64,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 )
 
 # ─── Auto copy shaders when changed ──────────────────────────────────────────
+file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/dist/shaders)
 file(GLOB_RECURSE SHADER_FILES "src/shaders/*")
 foreach(SHADER ${SHADER_FILES})
     get_filename_component(SHADER_NAME ${SHADER} NAME)

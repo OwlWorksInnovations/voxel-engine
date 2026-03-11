@@ -15,6 +15,10 @@ inline RaycastResult Raycast(World &world, glm::vec3 origin,
   result.hit = false;
 
   direction = glm::normalize(direction);
+  const float EPSILON = 1e-6f;
+  if (fabs(direction.x) < EPSILON) direction.x = (direction.x >= 0) ? EPSILON : -EPSILON;
+  if (fabs(direction.y) < EPSILON) direction.y = (direction.y >= 0) ? EPSILON : -EPSILON;
+  if (fabs(direction.z) < EPSILON) direction.z = (direction.z >= 0) ? EPSILON : -EPSILON;
 
   // convert origin to voxel coords
   glm::ivec3 voxel = glm::ivec3((int)floor(origin.x / VOXEL_SIZE),

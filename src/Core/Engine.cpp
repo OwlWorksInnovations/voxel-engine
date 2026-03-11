@@ -65,7 +65,7 @@ void Engine::Run() {
   // chunk.Generate(1337);
 
   // World
-  World world(1337, 16);
+  World world(1337, 4);
 
   while (!glfwWindowShouldClose(window)) {
     // Update input before wiping state
@@ -129,9 +129,6 @@ void Engine::Run() {
     shader->SetMat4("model", model);
     shader->SetMat4("view", view);
     shader->SetMat4("projection", projection);
-
-    // Update world with play position
-    world.Update(camera->position);
 
     // Draw calls
     // mesh.Draw();

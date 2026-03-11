@@ -1,4 +1,5 @@
 #pragma once
+#include "Camera.hpp"
 #include "Shader.hpp"
 #include <glad/glad.h>
 
@@ -14,4 +15,5 @@ public:
 private:
   static GLFWwindow *window;
   static Shader *shader;
+  static Camera *camera;
 };

@@ -3,6 +3,7 @@
 #include "../Render/Mesh.hpp"
 #include "../Render/Shader.hpp"
 #include "../Render/Texture.hpp"
+#include "../World/Chunk.hpp"
 #include "Input.hpp"
 #include <GLFW/glfw3.h>
 #include <stdexcept>
@@ -42,20 +43,24 @@ void Engine::InitWindow(int width, int height, const std::string &windowTitle) {
 void Engine::Run() {
   float lastFrame = 0.0f;
   // Example
-  // simple quad
+
+  // Mesh
   std::vector<Vertex> vertices = {
       {-0.5f, 0.5f, 0.0f, 0.0f, 1.0f},  // top left
       {0.5f, 0.5f, 0.0f, 1.0f, 1.0f},   // top right
       {0.5f, -0.5f, 0.0f, 1.0f, 0.0f},  // bottom right
       {-0.5f, -0.5f, 0.0f, 0.0f, 0.0f}, // bottom left
   };
-
   std::vector<unsigned int> indices = {0, 1, 2, 0, 2, 3};
-
   Mesh mesh;
   mesh.SetData(vertices, indices);
 
+  // Texture
   Texture texture("assets/textures/Grass/Grass_01-128x128.png");
+
+  // Chunk
+  Chunk chunk(glm::ivec3(0, 0, 0));
+  chunk.Generate(1337);
 
   while (!glfwWindowShouldClose(window)) {
     // Update input before wiping state
@@ -82,26 +87,30 @@ void Engine::Run() {
       camera->Move(CameraMovement::UP, deltaTime);
     if (Input::IsKeyHeld(GLFW_KEY_LEFT_SHIFT))
       camera->Move(CameraMovement::DOWN, deltaTime);
-
     camera->Rotate(Input::GetMouseDeltaX(), -Input::GetMouseDeltaY());
 
     // Clear screen
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Camera
     int w, h;
     glfwGetFramebufferSize(window, &w, &h);
     glm::mat4 view = camera->GetViewMatrix();
     glm::mat4 projection = camera->GetProjectionMatrix((float)w / (float)h);
     glm::mat4 model = glm::mat4(1.0f);
 
+    // Shader uniforms
     shader->Use();
     texture.Bind(0);
     shader->SetInt("texture1", 0);
     shader->SetMat4("model", model);
     shader->SetMat4("view", view);
     shader->SetMat4("projection", projection);
-    mesh.Draw();
+
+    // Draw calls
+    chunk.Draw();
+    // mesh.Draw();
 
     glfwSwapBuffers(window);
   }

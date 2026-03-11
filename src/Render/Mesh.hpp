@@ -20,7 +20,9 @@ public:
 private:
   unsigned int VAO, VBO, EBO;
   unsigned int indexCount;
+  bool initialized;
 
+  void Init();
   void Setup(const std::vector<Vertex> &vertices,
              const std::vector<unsigned int> &indices);
 };

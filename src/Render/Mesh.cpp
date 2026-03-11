@@ -1,15 +1,21 @@
 #include "Mesh.hpp"
 
-Mesh::Mesh() : VAO(0), VBO(0), EBO(0), indexCount(0) {
+Mesh::Mesh() : VAO(0), VBO(0), EBO(0), indexCount(0), initialized(false) {}
+
+void Mesh::Init() {
+  if (initialized)
+    return;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &EBO);
+  initialized = true;
 }
 
 Mesh::~Mesh() { Clear(); }
 
 void Mesh::SetData(const std::vector<Vertex> &vertices,
                    const std::vector<unsigned int> &indices) {
+  Init();
   indexCount = indices.size();
   Setup(vertices, indices);
 }
@@ -40,18 +46,20 @@ void Mesh::Setup(const std::vector<Vertex> &vertices,
 }
 
 void Mesh::Draw() {
+  if (!initialized || indexCount == 0)
+    return;
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
 }
 
 void Mesh::Clear() {
-  if (VAO)
-    glDeleteVertexArrays(1, &VAO);
-  if (VBO)
-    glDeleteBuffers(1, &VBO);
-  if (EBO)
-    glDeleteBuffers(1, &EBO);
+  if (!initialized)
+    return;
+  glDeleteVertexArrays(1, &VAO);
+  glDeleteBuffers(1, &VBO);
+  glDeleteBuffers(1, &EBO);
   VAO = VBO = EBO = 0;
   indexCount = 0;
+  initialized = false;
 }

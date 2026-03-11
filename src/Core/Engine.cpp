@@ -64,7 +64,7 @@ void Engine::Run() {
   // chunk.Generate(1337);
 
   // World
-  World world(1337, 4);
+  World world(1337, 16);
 
   while (!glfwWindowShouldClose(window)) {
     // Update input before wiping state

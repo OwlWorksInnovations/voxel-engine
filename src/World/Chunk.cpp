@@ -1,8 +1,8 @@
 #include "Chunk.hpp"
 #include "FastNoiseLite.h"
-#include <glm/glm.hpp>
 
-Chunk::Chunk(glm::ivec3 position) : position(position), dirty(true) {
+Chunk::Chunk(glm::ivec3 position)
+    : position(position), state(ChunkState::Empty) {
   blocks.fill(BlockType::Air);
 }
 
@@ -14,29 +14,25 @@ void Chunk::Generate(int seed) {
 
   for (int x = 0; x < CHUNK_SIZE; x++) {
     for (int z = 0; z < CHUNK_SIZE; z++) {
-      // world position of this column
       float wx = (position.x * CHUNK_SIZE + x) * VOXEL_SIZE;
       float wz = (position.z * CHUNK_SIZE + z) * VOXEL_SIZE;
-
-      // height in voxels (0 to CHUNK_SIZE)
-      float n = noise.GetNoise(wx, wz);                   // -1 to 1
-      int height = (int)((n + 1.0f) * 0.5f * CHUNK_SIZE); // 0 to CHUNK_SIZE
+      float n = noise.GetNoise(wx, wz);
+      int height = (int)((n + 1.0f) * 0.5f * CHUNK_SIZE);
 
       for (int y = 0; y < CHUNK_SIZE; y++) {
         int wy = position.y * CHUNK_SIZE + y;
-
         if (wy > height)
-          SetBlock(x, y, z, BlockType::Air);
+          blocks[Index(x, y, z)] = BlockType::Air;
         else if (wy == height)
-          SetBlock(x, y, z, BlockType::Grass);
+          blocks[Index(x, y, z)] = BlockType::Grass;
         else if (wy >= height - 3)
-          SetBlock(x, y, z, BlockType::Dirt);
+          blocks[Index(x, y, z)] = BlockType::Dirt;
         else
-          SetBlock(x, y, z, BlockType::Stone);
+          blocks[Index(x, y, z)] = BlockType::Stone;
       }
     }
   }
-  dirty = true;
+  state = ChunkState::Generated;
 }
 
 bool Chunk::InBounds(int x, int y, int z) const {
@@ -48,7 +44,7 @@ void Chunk::SetBlock(int x, int y, int z, BlockType type) {
   if (!InBounds(x, y, z))
     return;
   blocks[Index(x, y, z)] = type;
-  dirty = true;
+  state = ChunkState::Generated; // mark for rebuild
 }
 
 BlockType Chunk::GetBlock(int x, int y, int z) const {
@@ -59,19 +55,16 @@ BlockType Chunk::GetBlock(int x, int y, int z) const {
 
 bool Chunk::IsFaceVisible(int x, int y, int z) const {
   if (!InBounds(x, y, z))
-    return true; // chunk border, always draw
+    return true;
   return IsAir(GetBlock(x, y, z));
 }
 
 void Chunk::AddFace(std::vector<Vertex> &vertices,
                     std::vector<unsigned int> &indices, glm::vec3 pos,
                     glm::vec3 normal) {
-
   unsigned int base = vertices.size();
 
-  // build a quad perpendicular to normal
   glm::vec3 up, right;
-
   if (glm::abs(normal.y) > 0.5f) {
     right = glm::vec3(1, 0, 0);
     up = glm::vec3(0, 0, 1);
@@ -104,9 +97,8 @@ void Chunk::AddFace(std::vector<Vertex> &vertices,
   indices.push_back(base + 3);
 }
 
-void Chunk::BuildMesh() {
-  std::vector<Vertex> vertices;
-  std::vector<unsigned int> indices;
+ChunkMeshData Chunk::BuildMeshData() {
+  ChunkMeshData data;
 
   static const glm::ivec3 directions[6] = {{1, 0, 0},  {-1, 0, 0}, {0, 1, 0},
                                            {0, -1, 0}, {0, 0, 1},  {0, 0, -1}};
@@ -124,19 +116,23 @@ void Chunk::BuildMesh() {
 
         for (auto &dir : directions) {
           if (IsFaceVisible(x + dir.x, y + dir.y, z + dir.z)) {
-            AddFace(vertices, indices, worldPos, glm::vec3(dir));
+            AddFace(data.vertices, data.indices, worldPos, glm::vec3(dir));
           }
         }
       }
     }
   }
 
-  mesh.SetData(vertices, indices);
-  dirty = false;
+  state = ChunkState::MeshReady;
+  return data;
+}
+
+void Chunk::UploadMesh(ChunkMeshData &data) {
+  mesh.SetData(data.vertices, data.indices);
+  state = ChunkState::Ready;
 }
 
 void Chunk::Draw() {
-  if (dirty)
-    BuildMesh();
-  mesh.Draw();
+  if (state == ChunkState::Ready)
+    mesh.Draw();
 }

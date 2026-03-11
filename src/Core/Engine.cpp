@@ -3,8 +3,9 @@
 #include "../Render/Mesh.hpp"
 #include "../Render/Shader.hpp"
 #include "../Render/Texture.hpp"
-#include "../World/Chunk.hpp"
+#include "../World/Raycast.hpp"
 #include "../World/World.hpp"
+#include "../World/Block.hpp"
 #include "Input.hpp"
 #include <GLFW/glfw3.h>
 #include <stdexcept>
@@ -103,6 +104,23 @@ void Engine::Run() {
     glm::mat4 view = camera->GetViewMatrix();
     glm::mat4 projection = camera->GetProjectionMatrix((float)w / (float)h);
     glm::mat4 model = glm::mat4(1.0f);
+
+    // Update world with play position (must be before block operations)
+    world.Update(camera->position);
+
+    // Block breaking and placing
+    RaycastResult hit = Raycast(world, camera->position, camera->front, 10.0f);
+
+    if (Input::IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT) && hit.hit) {
+      world.SetBlockVoxel(hit.blockPos, BlockType::Air);
+    }
+
+    if (Input::IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_RIGHT) && hit.hit) {
+      glm::ivec3 placePos = hit.blockPos + hit.normal;
+      if (IsAir(world.GetBlockVoxel(placePos))) {
+        world.SetBlockVoxel(placePos, BlockType::Grass);
+      }
+    }
 
     // Shader uniforms
     shader->Use();

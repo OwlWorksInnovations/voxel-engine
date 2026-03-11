@@ -37,10 +37,15 @@ void Mesh::Setup(const std::vector<Vertex> &vertices,
                         (void *)offsetof(Vertex, x));
   glEnableVertexAttribArray(0);
 
-  // texture coords
+  // texcoord
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                         (void *)offsetof(Vertex, u));
   glEnableVertexAttribArray(1);
+
+  // brightness
+  glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        (void *)offsetof(Vertex, brightness));
+  glEnableVertexAttribArray(2);
 
   glBindVertexArray(0);
 }

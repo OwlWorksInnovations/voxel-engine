@@ -11,6 +11,7 @@ public:
   static bool IsKeyReleased(int key);
 
   static bool IsMouseButtonPressed(int button);
+  static bool IsMouseButtonJustPressed(int button);
   static double GetMouseX();
   static double GetMouseY();
   static double GetMouseDeltaX();
@@ -25,6 +26,7 @@ private:
 
   static bool currentKeys[GLFW_KEY_LAST];
   static bool previousKeys[GLFW_KEY_LAST];
+  static bool previousMouseButtons[GLFW_MOUSE_BUTTON_LAST];
   static bool mouseButtons[GLFW_MOUSE_BUTTON_LAST];
 
   static double mouseX, mouseY;

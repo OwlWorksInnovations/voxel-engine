@@ -14,7 +14,14 @@ struct ChunkMeshData {
   std::vector<unsigned int> indices;
 };
 
-enum class ChunkState { Empty, Generating, Generated, MeshReady, Ready };
+enum class ChunkState {
+  Empty,
+  Generating,
+  Generated,
+  NeedsRebuild,
+  MeshReady,
+  Ready
+};
 
 class Chunk {
 public:

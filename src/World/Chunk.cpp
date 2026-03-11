@@ -62,6 +62,7 @@ bool Chunk::IsFaceVisible(int x, int y, int z) const {
 void Chunk::AddFace(std::vector<Vertex> &vertices,
                     std::vector<unsigned int> &indices, glm::vec3 pos,
                     glm::vec3 normal) {
+
   unsigned int base = vertices.size();
 
   glm::vec3 up, right;
@@ -84,10 +85,20 @@ void Chunk::AddFace(std::vector<Vertex> &vertices,
   glm::vec3 p2 = center + right * h + up * h;
   glm::vec3 p3 = center - right * h + up * h;
 
-  vertices.push_back({p0.x, p0.y, p0.z, 0.0f, 0.0f});
-  vertices.push_back({p1.x, p1.y, p1.z, 1.0f, 0.0f});
-  vertices.push_back({p2.x, p2.y, p2.z, 1.0f, 1.0f});
-  vertices.push_back({p3.x, p3.y, p3.z, 0.0f, 1.0f});
+  float brightness = 1.0f;
+  if (normal.y < 0)
+    brightness = 0.3f;
+  else if (normal.y > 0)
+    brightness = 1.0f;
+  else if (normal.x != 0)
+    brightness = 0.6f;
+  else if (normal.z != 0)
+    brightness = 0.8f;
+
+  vertices.push_back({p0.x, p0.y, p0.z, 0.0f, 0.0f, brightness});
+  vertices.push_back({p1.x, p1.y, p1.z, 1.0f, 0.0f, brightness});
+  vertices.push_back({p2.x, p2.y, p2.z, 1.0f, 1.0f, brightness});
+  vertices.push_back({p3.x, p3.y, p3.z, 0.0f, 1.0f, brightness});
 
   indices.push_back(base + 0);
   indices.push_back(base + 1);

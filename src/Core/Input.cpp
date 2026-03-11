@@ -3,6 +3,7 @@
 
 bool Input::currentKeys[GLFW_KEY_LAST] = {};
 bool Input::previousKeys[GLFW_KEY_LAST] = {};
+bool Input::previousMouseButtons[GLFW_MOUSE_BUTTON_LAST] = {};
 bool Input::mouseButtons[GLFW_MOUSE_BUTTON_LAST] = {};
 double Input::mouseX = 0, Input::mouseY = 0;
 double Input::lastMouseX = 0, Input::lastMouseY = 0;
@@ -20,6 +21,8 @@ void Input::Update() {
   deltaY = mouseY - lastMouseY;
   lastMouseX = mouseX;
   lastMouseY = mouseY;
+  std::copy(mouseButtons, mouseButtons + GLFW_MOUSE_BUTTON_LAST,
+            previousMouseButtons);
 }
 
 void Input::KeyCallback(GLFWwindow *window, int key, int scancode, int action,
@@ -48,6 +51,9 @@ bool Input::IsKeyReleased(int key) {
 }
 
 bool Input::IsMouseButtonPressed(int button) { return mouseButtons[button]; }
+bool Input::IsMouseButtonJustPressed(int button) {
+  return mouseButtons[button] && !previousMouseButtons[button];
+}
 double Input::GetMouseX() { return mouseX; }
 double Input::GetMouseY() { return mouseY; }
 double Input::GetMouseDeltaX() { return deltaX; }

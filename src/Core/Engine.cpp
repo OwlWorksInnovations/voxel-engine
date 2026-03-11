@@ -4,6 +4,7 @@
 #include "../Render/Shader.hpp"
 #include "../Render/Texture.hpp"
 #include "../World/Chunk.hpp"
+#include "../World/World.hpp"
 #include "Input.hpp"
 #include <GLFW/glfw3.h>
 #include <stdexcept>
@@ -59,8 +60,11 @@ void Engine::Run() {
   Texture texture("assets/textures/Grass/Grass_01-128x128.png");
 
   // Chunk
-  Chunk chunk(glm::ivec3(0, 0, 0));
-  chunk.Generate(1337);
+  // Chunk chunk(glm::ivec3(0, 0, 0));
+  // chunk.Generate(1337);
+
+  // World
+  World world(1337, 4);
 
   while (!glfwWindowShouldClose(window)) {
     // Update input before wiping state
@@ -108,9 +112,13 @@ void Engine::Run() {
     shader->SetMat4("view", view);
     shader->SetMat4("projection", projection);
 
+    // Update world with play position
+    world.Update(camera->position);
+
     // Draw calls
-    chunk.Draw();
     // mesh.Draw();
+    // chunk.Draw();
+    world.Draw(*shader);
 
     glfwSwapBuffers(window);
   }

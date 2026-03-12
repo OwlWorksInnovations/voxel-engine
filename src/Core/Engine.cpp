@@ -1,4 +1,6 @@
 #include "Engine.hpp"
+#include "../Render/Mesh.hpp"
+#include "../Render/Shader.hpp"
 #include "Input.hpp"
 #include <glad/glad.h>
 
@@ -38,18 +40,43 @@ void Engine::InitWindow(int width, int height, const char *title) {
 }
 
 void Engine::Run() {
+  // Shader
+  Shader shader("shaders/shader.vs", "shaders/shader.fs");
+
+  // Mesh
+  Mesh mesh;
+
+  std::vector<Vertex> vertices = {
+      {-0.5f, 0.5f, 0.0f, 0.0f, 1.0f},  // top-left
+      {0.5f, 0.5f, 0.0f, 1.0f, 1.0f},   // top-right
+      {0.5f, -0.5f, 0.0f, 1.0f, 0.0f},  // bottom-right
+      {-0.5f, -0.5f, 0.0f, 0.0f, 0.0f}, // bottom-left
+  };
+
+  std::vector<unsigned int> indices = {
+      0, 1, 2, // first triangle
+      0, 2, 3  // second triangle
+  };
+
+  mesh.SetData(vertices, indices);
+
   // Main loop
   while (!glfwWindowShouldClose(window)) {
+    // Shader
+    shader.Use();
+
     // Input
     Input::Update();
 
     // Clear the screen
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (Input::IsKeyPressed(GLFW_KEY_ESCAPE)) {
       glfwSetWindowShouldClose(window, true);
     }
+
+    mesh.Draw();
 
     // Swap front and back buffers
     glfwSwapBuffers(window);

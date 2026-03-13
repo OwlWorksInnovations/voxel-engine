@@ -1,6 +1,17 @@
 #version 330 core
-out vec4 FragColor;
 
-void main() {
-    FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+in vec2 v_uv;
+
+out vec4 frag_color;
+
+uniform sampler2D u_texture;
+
+void main()
+{
+    vec4 color = texture(u_texture, v_uv);
+
+    if (color.a < 0.1)
+        discard;
+
+    frag_color = color;
 }

@@ -1,8 +1,8 @@
 # To-do list
 
 ## Engine Foundation
-- [ ] Window & OpenGL context management (if not already wrapped)
-- [ ] Game loop (fixed timestep update + render)
+- [x] Window & OpenGL context management (if not already wrapped)
+- [x] Game loop (fixed timestep update + render)
 - [ ] Resource manager (load/cache shaders, textures)
 - [ ] Event system (decouple input from gameplay)
 

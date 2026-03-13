@@ -1,6 +1,7 @@
 #include "Engine.hpp"
 #include "../Render/Mesh.hpp"
 #include "../Render/Shader.hpp"
+#include "../Render/Texture.hpp"
 #include "Input.hpp"
 #include <glad/glad.h>
 
@@ -60,6 +61,10 @@ void Engine::Run() {
 
   mesh.SetData(vertices, indices);
 
+  // Texture
+  Texture texture;
+  texture.load("assets/textures/Bricks/Bricks_01-128x128.png");
+
   // Main loop
   while (!glfwWindowShouldClose(window)) {
     // Shader
@@ -75,6 +80,18 @@ void Engine::Run() {
     if (Input::IsKeyPressed(GLFW_KEY_ESCAPE)) {
       glfwSetWindowShouldClose(window, true);
     }
+
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+
+    shader.SetMat4("u_model", model);
+    shader.SetMat4("u_view", view);
+    shader.SetMat4("u_projection", projection);
+
+    // Texture
+    texture.bind(0);
+    shader.SetInt("u_texture", 0);
 
     mesh.Draw();
 

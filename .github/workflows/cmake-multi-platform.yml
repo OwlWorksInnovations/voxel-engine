@@ -50,30 +50,36 @@ jobs:
       # ─── Configure CMake ───────────────────────────────
       - name: Configure CMake (Linux)
         if: runner.os == 'Linux'
-        run: >
-          cmake -B build
-          -S .
-          -DCMAKE_BUILD_TYPE=Release
-          -DCMAKE_C_COMPILER=gcc
-          -DCMAKE_CXX_COMPILER=g++
+        run: |
+          cmake -B build \
+                -S . \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_C_COMPILER=gcc \
+                -DCMAKE_CXX_COMPILER=g++
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
-        run: >
-          cmake -B build
-          -S .
-          -DCMAKE_BUILD_TYPE=Release
-          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        run: |
+          cmake -B build \
+                -S . \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       # ─── Build ─────────────────────────────────────────
       - name: Build
         run: cmake --build build --config Release
 
       # ─── Zip the dist folder ───────────────────────────
-      - name: Zip dist folder
+      - name: Zip dist folder (Linux)
+        if: runner.os == 'Linux'
         run: |
           cd build
           zip -r dist.zip dist
+
+      - name: Zip dist folder (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Compress-Archive -Path build\dist\* -DestinationPath build\dist.zip
 
       # ─── Upload artifact ───────────────────────────────
       - name: Upload artifact

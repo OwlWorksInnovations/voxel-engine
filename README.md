@@ -4,7 +4,7 @@
 
 ## Compile & Run (All in one)
 ```
-cd ./build && cmake --build . && cd ../dist && ./voxel-engine
+mkdir build/ && cd ./build && cmake --build . && cd ../dist && ./voxel-engine
 ```
 
 ### Keybinds

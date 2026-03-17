@@ -4,7 +4,7 @@
 
 ## Compile & Run (All in one)
 ```
-make && cd dist/ && ./voxel-engine
+cd ./build && cmake --build . && cd ../dist && ./voxel-engine
 ```
 
 ### Keybinds
@@ -18,5 +18,5 @@ I followed the getting started tutorial on [LearnOpenGL](https://learnopengl.com
 ## Is this project finished?
 No, if you would like to see a progress report look at the TODO.md in this repo.
 
-## Should you learn opengl?
-It depends if you want to make a game more than the game engine. I personally enjoy knowing how everything works because if I want to implement something I don't need to google "how to do x in godot". A downside of this is time, because now I need to implement whatever I need from scratch. This way I will always be able to know exactly how to use it.
+## Should you learn OpenGL?
+It depends if you want to make a game more than a game engine. I personally enjoy knowing how everything works because if I want to implement something I don't need to google "how to do x in Godot". A downside of this is time, because now I need to implement whatever I need from scratch but then again this way I will always be able to know exactly how to use everything. Another reason might be if you want to have flexibility and have tight performance constraints, like making a voxel engine because in Godot implementing all the optimization methods don't nearly match the performance gain compared to scratch in OpenGL.

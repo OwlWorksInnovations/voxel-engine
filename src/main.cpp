@@ -1,15 +1,17 @@
 #include "Core/Engine.hpp"
 #include <iostream>
 
+// Global
+const char *title = "Voxel Engine";
+int screenWidth = 1280;
+int screenHeight = 720;
+
 int main() {
-  try {
-    Engine::InitWindow(1280, 720, "Voxel Engine");
-    Engine::Run();
-    Engine::Shutdown();
-  } catch (const std::exception &e) {
-    std::cerr << e.what() << std::endl;
-    return -1;
-  }
+  std::cout << "Hello world!" << std::endl;
+
+  Engine::InitWindow(screenWidth, screenHeight, title);
+  Engine::Run();
+  Engine::Exit();
 
   return 0;
 }

@@ -1,19 +1,14 @@
 #pragma once
-#include "Camera.hpp"
-#include "Shader.hpp"
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
-#include <string>
 
 class Engine {
 public:
-  static void InitWindow(int width, int height, const std::string &windowTitle);
+  static void InitWindow(int width, int height, const char *title);
   static void Run();
-  static void Shutdown();
+  static void Exit();
 
 private:
   static GLFWwindow *window;
-  static Shader *shader;
-  static Camera *camera;
 };

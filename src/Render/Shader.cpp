@@ -2,9 +2,10 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath) {
-  // read files
+  // read shader files
   std::string vertexCode, fragmentCode;
   std::ifstream vFile, fFile;
 
@@ -26,7 +27,7 @@ Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath) {
   const char *vCode = vertexCode.c_str();
   const char *fCode = fragmentCode.c_str();
 
-  // compile
+  // compile shaders
   unsigned int vertex, fragment;
 
   vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -39,7 +40,7 @@ Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath) {
   glCompileShader(fragment);
   CheckCompileErrors(fragment, "FRAGMENT");
 
-  // link
+  // link shaders
   ID = glCreateProgram();
   glAttachShader(ID, vertex);
   glAttachShader(ID, fragment);

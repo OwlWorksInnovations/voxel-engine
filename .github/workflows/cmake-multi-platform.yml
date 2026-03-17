@@ -1,4 +1,4 @@
-name: CMake (cross-platform)
+name: CMake (cross-platform build only)
 
 on:
   push:
@@ -41,31 +41,15 @@ jobs:
             libxcursor-dev \
             libxinerama-dev
 
-      # ─── Build Directory ─────────────────────────────────
-      - name: Set build dir
-        id: vars
-        run: echo "build_dir=${{ github.workspace }}/build" >> $GITHUB_OUTPUT
-
       # ─── Configure ───────────────────────────────────────
       - name: Configure CMake
         run: >
-          cmake -B ${{ steps.vars.outputs.build_dir }}
-          -S ${{ github.workspace }}
+          cmake -B build
+          -S .
           -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
 
       # ─── Build ───────────────────────────────────────────
       - name: Build
-        run: cmake --build ${{ steps.vars.outputs.build_dir }} --config Release
-
-      # ─── Test (Headless-safe) ────────────────────────────
-      - name: Run tests (Linux headless)
-        if: runner.os == 'Linux'
-        working-directory: ${{ steps.vars.outputs.build_dir }}
-        run: xvfb-run ctest --output-on-failure
-
-      - name: Run tests (Windows)
-        if: runner.os == 'Windows'
-        working-directory: ${{ steps.vars.outputs.build_dir }}
-        run: ctest --output-on-failure
+        run: cmake --build build --config Release

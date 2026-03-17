@@ -69,13 +69,6 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      # ─── Copy Windows Release exe to dist folder ───────
-      - name: Fix Windows dist folder
-        if: runner.os == 'Windows'
-        run: |
-          mkdir -p build/dist
-          copy build\Release\*.exe build\dist\
-
       # ─── Zip the dist folder ───────────────────────────
       - name: Zip dist folder
         run: |

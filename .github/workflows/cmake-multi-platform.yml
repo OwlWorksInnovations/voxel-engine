@@ -1,4 +1,4 @@
-name: CMake (cross-platform build only)
+name: CMake (build + artifact)
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ─── Linux Dependencies ───────────────────────────────
+      # ─── Linux deps ──────────────────────────────────────
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -41,8 +41,18 @@ jobs:
             libxcursor-dev \
             libxinerama-dev
 
+      # ─── vcpkg (Windows) ─────────────────────────────────
+      - name: Setup vcpkg
+        if: runner.os == 'Windows'
+        uses: lukka/run-vcpkg@v11
+
+      - name: Install GLFW (Windows)
+        if: runner.os == 'Windows'
+        run: vcpkg install glfw3
+
       # ─── Configure ───────────────────────────────────────
-      - name: Configure CMake
+      - name: Configure CMake (Linux)
+        if: runner.os == 'Linux'
         run: >
           cmake -B build
           -S .
@@ -50,6 +60,35 @@ jobs:
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
 
+      - name: Configure CMake (Windows)
+        if: runner.os == 'Windows'
+        run: >
+          cmake -B build
+          -S .
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+
       # ─── Build ───────────────────────────────────────────
       - name: Build
         run: cmake --build build --config Release
+
+      # ─── Zip dist ────────────────────────────────────────
+      - name: Zip dist (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          cd build
+          zip -r dist-${{ matrix.os }}.zip dist
+
+      - name: Zip dist (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Compress-Archive -Path build/dist/* -DestinationPath dist-${{ matrix.os }}.zip
+
+      # ─── Upload artifact ─────────────────────────────────
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.os }}
+          path: |
+            build/dist-*.zip
+            dist-*.zip

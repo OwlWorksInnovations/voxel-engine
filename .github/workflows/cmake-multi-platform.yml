@@ -17,9 +17,6 @@ jobs:
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
-          - os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
@@ -27,8 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ─── Linux deps ──────────────────────────────────────
-      - name: Install dependencies (Linux)
+      # ─── Linux dependencies ─────────────────────────────
+      - name: Install Linux dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt update
@@ -39,26 +36,26 @@ jobs:
             libxrandr-dev \
             libxi-dev \
             libxcursor-dev \
-            libxinerama-dev
+            libxinerama-dev \
+            zip
 
-      # ─── vcpkg (Windows) ─────────────────────────────────
-      - name: Setup vcpkg
+      # ─── Windows vcpkg + GLFW ───────────────────────────
+      - name: Install vcpkg and GLFW
         if: runner.os == 'Windows'
-        uses: lukka/run-vcpkg@v11
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.bat
+          ./vcpkg/vcpkg install glfw3:x64-windows
 
-      - name: Install GLFW (Windows)
-        if: runner.os == 'Windows'
-        run: vcpkg install glfw3
-
-      # ─── Configure ───────────────────────────────────────
+      # ─── Configure CMake ───────────────────────────────
       - name: Configure CMake (Linux)
         if: runner.os == 'Linux'
         run: >
           cmake -B build
           -S .
           -DCMAKE_BUILD_TYPE=Release
-          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_C_COMPILER=gcc
+          -DCMAKE_CXX_COMPILER=g++
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
@@ -66,29 +63,29 @@ jobs:
           cmake -B build
           -S .
           -DCMAKE_BUILD_TYPE=Release
-          -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-      # ─── Build ───────────────────────────────────────────
+      # ─── Build ─────────────────────────────────────────
       - name: Build
         run: cmake --build build --config Release
 
-      # ─── Zip dist ────────────────────────────────────────
+      # ─── Zip dist folder ───────────────────────────────
       - name: Zip dist (Linux)
         if: runner.os == 'Linux'
         run: |
           cd build
-          zip -r dist-${{ matrix.os }}.zip dist
+          zip -r dist-linux.zip dist
 
       - name: Zip dist (Windows)
         if: runner.os == 'Windows'
         run: |
-          Compress-Archive -Path build/dist/* -DestinationPath dist-${{ matrix.os }}.zip
+          Compress-Archive -Path build/dist/* -DestinationPath dist-windows.zip
 
-      # ─── Upload artifact ─────────────────────────────────
+      # ─── Upload artifact ───────────────────────────────
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-${{ matrix.os }}
           path: |
-            build/dist-*.zip
             dist-*.zip
+            build/dist-*.zip

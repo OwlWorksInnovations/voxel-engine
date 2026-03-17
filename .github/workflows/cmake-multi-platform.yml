@@ -69,23 +69,22 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      # ─── Zip dist folder ───────────────────────────────
-      - name: Zip dist (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          cd build
-          zip -r dist-linux.zip dist
-
-      - name: Zip dist (Windows)
+      # ─── Copy Windows Release exe to dist folder ───────
+      - name: Fix Windows dist folder
         if: runner.os == 'Windows'
         run: |
-          Compress-Archive -Path build/dist/* -DestinationPath dist-windows.zip
+          mkdir -p build/dist
+          copy build\Release\*.exe build\dist\
+
+      # ─── Zip the dist folder ───────────────────────────
+      - name: Zip dist folder
+        run: |
+          cd build
+          zip -r dist.zip dist
 
       # ─── Upload artifact ───────────────────────────────
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-${{ matrix.os }}
-          path: |
-            dist-*.zip
-            build/dist-*.zip
+          path: build/dist.zip

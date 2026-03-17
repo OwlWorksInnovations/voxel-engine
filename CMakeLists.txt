@@ -4,12 +4,12 @@ project(voxel-engine)
 set(CMAKE_CXX_STANDARD 23)
 
 # ─── Output ─────────────────────────────────────────────
-# Place executables in dist for all configs (Release, Debug, etc.)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/dist)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/dist)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/dist)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_SOURCE_DIR}/dist)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_SOURCE_DIR}/dist)
+# All executables go into build/dist, cross-platform
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/dist)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/dist)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/dist)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/dist)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/dist)
 
 # ─── Packages ───────────────────────────────────────────
 find_package(OpenGL REQUIRED)
@@ -60,17 +60,17 @@ target_link_libraries(${PROJECT_NAME}
     imgui
 )
 
-# ─── Copy assets to dist ────────────────────────────────
+# ─── Copy assets to build/dist ──────────────────────────
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/assets
-        ${CMAKE_SOURCE_DIR}/dist/assets
+        ${CMAKE_BINARY_DIR}/dist/assets
 )
 
-# ─── Auto copy shaders when changed ─────────────────────
-file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/dist/shaders)
+# ─── Copy shaders to build/dist/shaders ────────────────
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/dist/shaders)
 file(GLOB_RECURSE SHADER_FILES "src/shaders/*")
 foreach(SHADER ${SHADER_FILES})
     get_filename_component(SHADER_NAME ${SHADER} NAME)
-    configure_file(${SHADER} ${CMAKE_SOURCE_DIR}/dist/shaders/${SHADER_NAME} COPYONLY)
+    configure_file(${SHADER} ${CMAKE_BINARY_DIR}/dist/shaders/${SHADER_NAME} COPYONLY)
 endforeach()

@@ -114,7 +114,7 @@ void Engine::Run() {
 
     shader.Use();
 
-    int w, h;
+    int w, h = 0;
     glfwGetFramebufferSize(window, &w, &h);
     float aspect = (float)w / (float)h;
 

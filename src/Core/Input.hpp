@@ -18,6 +18,8 @@ public:
   static bool IsKeyPressed(int key);
   static bool IsKeyHeld(int key);
   static bool IsKeyReleased(int key);
+  static float GetMouseDeltaX();
+  static float GetMouseDeltaY();
 
   static const std::vector<KeyEvent> &GetEventQueue();
 
@@ -28,4 +30,8 @@ private:
   static std::unordered_map<int, KeyState> keyStates;
   static std::vector<KeyEvent> eventQueue;
   static std::vector<KeyEvent> frameQueue;
+
+  static GLFWwindow *window;
+  static float mouseDeltaX;
+  static float mouseDeltaY;
 };

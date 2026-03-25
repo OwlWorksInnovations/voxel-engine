@@ -41,6 +41,7 @@ add_executable(${PROJECT_NAME}
     src/Core/Input.cpp
     src/Render/Shader.cpp
     src/Render/Mesh.cpp
+    src/Render/InstancedMesh.cpp
     src/Render/Texture.cpp
     src/Render/Camera.cpp
 )

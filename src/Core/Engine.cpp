@@ -1,5 +1,6 @@
 #include "Engine.hpp"
 #include "../Render/Camera.hpp"
+#include "../Render/InstancedMesh.hpp"
 #include "../Render/Mesh.hpp"
 #include "../Render/Shader.hpp"
 #include "../Render/Texture.hpp"
@@ -42,10 +43,12 @@ void Engine::InitWindow(int width, int height, const char *title) {
   glEnable(GL_DEPTH_TEST);
 }
 
+// Global variables
+bool wireframeMode = false;
+
 void Engine::Run() {
   Shader shader("shaders/shader.vs", "shaders/shader.fs");
 
-  Mesh mesh;
   std::vector<Vertex> vertices = {
       // Back face
       {-0.5f, -0.5f, -0.5f, 0.0f, 0.0f},
@@ -87,12 +90,28 @@ void Engine::Run() {
       16, 17, 18, 16, 18, 19, // bottom
       20, 21, 22, 20, 22, 23, // top
   };
-  mesh.SetData(vertices, indices);
+
+  int chunkX = 128;
+  int chunkY = 128;
+  int chunkZ = 128;
+
+  std::vector<glm::vec3> positions;
+  positions.reserve(chunkX * chunkY * chunkZ);
+  for (int x = 0; x < chunkX; x++) {
+    for (int y = 0; y < chunkY; y++) {
+      for (int z = 0; z < chunkZ; z++) {
+        positions.push_back({(float)x, (float)y, (float)z});
+      }
+    }
+  }
+
+  InstancedMesh mesh;
+  mesh.SetData(vertices, indices, positions);
 
   Texture texture;
-  texture.load("assets/textures/Bricks/Bricks_01-128x128.png");
+  texture.load("assets/textures/Grass/Grass_01-128x128.png");
 
-  Camera camera({0.0f, 0.0f, 3.0f});
+  Camera camera({0.0f, 0.0f, 50.0f});
 
   float lastTime = 0.0f;
 
@@ -106,6 +125,16 @@ void Engine::Run() {
     if (Input::IsKeyPressed(GLFW_KEY_ESCAPE))
       glfwSetWindowShouldClose(window, true);
 
+    if (Input::IsKeyPressed(GLFW_KEY_SEMICOLON)) {
+      if (wireframeMode) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        wireframeMode = false;
+      } else if (!wireframeMode) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        wireframeMode = true;
+      }
+    }
+
     camera.ProcessKeyboard(deltaTime);
     camera.ProcessMouse(Input::GetMouseDeltaX(), Input::GetMouseDeltaY());
 
@@ -118,13 +147,13 @@ void Engine::Run() {
     glfwGetFramebufferSize(window, &w, &h);
     float aspect = (float)w / (float)h;
 
-    shader.SetMat4("u_model", glm::mat4(1.0f));
     shader.SetMat4("u_view", camera.GetViewMatrix());
     shader.SetMat4("u_projection", camera.GetProjectionMatrix(aspect));
 
     texture.bind(0);
     shader.SetInt("u_texture", 0);
-    mesh.Draw();
+
+    mesh.DrawInstanced(chunkX * chunkY * chunkZ);
 
     glfwSwapBuffers(window);
   }

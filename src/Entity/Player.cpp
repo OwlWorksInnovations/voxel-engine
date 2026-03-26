@@ -8,6 +8,24 @@ Player::Player(glm::vec3 startPos)
 }
 
 void Player::Update(float deltaTime, ChunkManager& chunkManager) {
+    // Check for block manipulation
+    if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+        glm::ivec3 hitBlock;
+        glm::ivec3 hitNormal;
+        if (chunkManager.Raycast(camera.position, camera.GetFront(), 5.0f, hitBlock, hitNormal)) {
+            chunkManager.SetBlockAtWorldPos(glm::vec3(hitBlock), 0);
+        }
+    }
+    
+    if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+        glm::ivec3 hitBlock;
+        glm::ivec3 hitNormal;
+        if (chunkManager.Raycast(camera.position, camera.GetFront(), 5.0f, hitBlock, hitNormal)) {
+            glm::ivec3 placePos = hitBlock + hitNormal;
+            chunkManager.SetBlockAtWorldPos(glm::vec3(placePos), 1);
+        }
+    }
+
     // Apply gravity
     if (!isGrounded) {
         velocity.y -= gravity * deltaTime;

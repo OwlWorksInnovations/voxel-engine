@@ -75,6 +75,18 @@ bool Input::IsKeyReleased(int key) {
   return it != keyStates.end() && it->second == KeyState::Released;
 }
 
+bool Input::IsMouseButtonPressed(int button) {
+    static std::unordered_map<int, bool> lastState;
+    bool current = glfwGetMouseButton(window, button) == GLFW_PRESS;
+    bool pressed = current && !lastState[button];
+    lastState[button] = current;
+    return pressed;
+}
+
+bool Input::IsMouseButtonHeld(int button) {
+    return glfwGetMouseButton(window, button) == GLFW_PRESS;
+}
+
 float Input::GetMouseDeltaX() { return mouseDeltaX; }
 float Input::GetMouseDeltaY() { return mouseDeltaY; }
 

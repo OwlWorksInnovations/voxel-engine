@@ -8,6 +8,9 @@
 #include "../Entity/Player.hpp"
 #include "Input.hpp"
 #include <glad/glad.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -41,6 +44,14 @@ void Engine::InitWindow(int width, int height, const char *title) {
 
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   Input::Init(window);
+
+  // Initialize ImGui
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO(); (void)io;
+  ImGui::StyleColorsDark();
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplOpenGL3_Init("#version 330");
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
@@ -110,6 +121,19 @@ void Engine::Run() {
 
     glm::mat4 viewProj = player.GetCamera().GetProjectionMatrix(aspect) * player.GetCamera().GetViewMatrix();
     chunkManager.Render(viewProj);
+
+    // Draw Crosshair using ImGui
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImVec2 center = ImVec2((float)w * 0.5f, (float)h * 0.5f);
+    ImGui::GetBackgroundDrawList()->AddCircle(center, 5.0f, IM_COL32(255, 255, 255, 200), 16, 2.0f);
+    ImGui::GetBackgroundDrawList()->AddLine(ImVec2(center.x - 10, center.y), ImVec2(center.x + 10, center.y), IM_COL32(255, 255, 255, 200), 2.0f);
+    ImGui::GetBackgroundDrawList()->AddLine(ImVec2(center.x, center.y - 10), ImVec2(center.x, center.y + 10), IM_COL32(255, 255, 255, 200), 2.0f);
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
   }

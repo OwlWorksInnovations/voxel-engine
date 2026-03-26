@@ -97,3 +97,75 @@ uint8_t ChunkManager::GetBlockAtWorldPos(glm::vec3 worldPos) {
 
     return chunk->GetBlock(localPos.x, localPos.y, localPos.z);
 }
+
+void ChunkManager::SetBlockAtWorldPos(glm::vec3 worldPos, uint8_t id) {
+    glm::ivec3 chunkPos = {
+        (int)std::floor(worldPos.x / (float)CHUNK_SIZE),
+        (int)std::floor(worldPos.y / (float)CHUNK_SIZE),
+        (int)std::floor(worldPos.z / (float)CHUNK_SIZE)
+    };
+
+    Chunk* chunk = GetChunk(chunkPos);
+    if (!chunk) return;
+
+    glm::ivec3 localPos = {
+        (int)std::floor(worldPos.x) % CHUNK_SIZE,
+        (int)std::floor(worldPos.y) % CHUNK_SIZE,
+        (int)std::floor(worldPos.z) % CHUNK_SIZE
+    };
+
+    // Handle negative modulo
+    if (localPos.x < 0) localPos.x += CHUNK_SIZE;
+    if (localPos.y < 0) localPos.y += CHUNK_SIZE;
+    if (localPos.z < 0) localPos.z += CHUNK_SIZE;
+
+    chunk->SetBlock(localPos.x, localPos.y, localPos.z, id);
+}
+
+bool ChunkManager::Raycast(glm::vec3 origin, glm::vec3 direction, float maxDist, glm::ivec3& outBlockPos, glm::ivec3& outNormal) {
+    glm::ivec3 currentPos = glm::ivec3(std::floor(origin.x), std::floor(origin.y), std::floor(origin.z));
+    
+    glm::vec3 step = glm::sign(direction);
+    glm::vec3 deltaDist = glm::abs(1.0f / direction);
+    
+    glm::vec3 sideDist;
+    sideDist.x = (step.x > 0) ? (currentPos.x + 1.0f - origin.x) * deltaDist.x : (origin.x - currentPos.x) * deltaDist.x;
+    sideDist.y = (step.y > 0) ? (currentPos.y + 1.0f - origin.y) * deltaDist.y : (origin.y - currentPos.y) * deltaDist.y;
+    sideDist.z = (step.z > 0) ? (currentPos.z + 1.0f - origin.z) * deltaDist.z : (origin.z - currentPos.z) * deltaDist.z;
+    
+    float dist = 0;
+    while (dist < maxDist) {
+        if (GetBlockAtWorldPos(glm::vec3(currentPos)) != 0) {
+            outBlockPos = currentPos;
+            return true;
+        }
+        
+        if (sideDist.x < sideDist.y) {
+            if (sideDist.x < sideDist.z) {
+                dist = sideDist.x;
+                sideDist.x += deltaDist.x;
+                currentPos.x += (int)step.x;
+                outNormal = glm::ivec3(-step.x, 0, 0);
+            } else {
+                dist = sideDist.z;
+                sideDist.z += deltaDist.z;
+                currentPos.z += (int)step.z;
+                outNormal = glm::ivec3(0, 0, -step.z);
+            }
+        } else {
+            if (sideDist.y < sideDist.z) {
+                dist = sideDist.y;
+                sideDist.y += deltaDist.y;
+                currentPos.y += (int)step.y;
+                outNormal = glm::ivec3(0, -step.y, 0);
+            } else {
+                dist = sideDist.z;
+                sideDist.z += deltaDist.z;
+                currentPos.z += (int)step.z;
+                outNormal = glm::ivec3(0, 0, -step.z);
+            }
+        }
+    }
+    
+    return false;
+}

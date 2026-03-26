@@ -25,6 +25,9 @@ public:
     Chunk* GetChunk(glm::ivec3 pos);
 
     uint8_t GetBlockAtWorldPos(glm::vec3 worldPos);
+    void SetBlockAtWorldPos(glm::vec3 worldPos, uint8_t id);
+
+    bool Raycast(glm::vec3 origin, glm::vec3 direction, float maxDist, glm::ivec3& outBlockPos, glm::ivec3& outNormal);
 
 private:
     std::map<glm::ivec3, std::unique_ptr<Chunk>, ChunkPosComparator> chunks;

@@ -73,3 +73,27 @@ Chunk* ChunkManager::GetChunk(glm::ivec3 pos) {
     }
     return nullptr;
 }
+
+uint8_t ChunkManager::GetBlockAtWorldPos(glm::vec3 worldPos) {
+    glm::ivec3 chunkPos = {
+        (int)std::floor(worldPos.x / (float)CHUNK_SIZE),
+        (int)std::floor(worldPos.y / (float)CHUNK_SIZE),
+        (int)std::floor(worldPos.z / (float)CHUNK_SIZE)
+    };
+
+    Chunk* chunk = GetChunk(chunkPos);
+    if (!chunk) return 0;
+
+    glm::ivec3 localPos = {
+        (int)std::floor(worldPos.x) % CHUNK_SIZE,
+        (int)std::floor(worldPos.y) % CHUNK_SIZE,
+        (int)std::floor(worldPos.z) % CHUNK_SIZE
+    };
+
+    // Handle negative modulo
+    if (localPos.x < 0) localPos.x += CHUNK_SIZE;
+    if (localPos.y < 0) localPos.y += CHUNK_SIZE;
+    if (localPos.z < 0) localPos.z += CHUNK_SIZE;
+
+    return chunk->GetBlock(localPos.x, localPos.y, localPos.z);
+}

@@ -19,6 +19,10 @@ public:
   void ProcessKeyboard(float deltaTime);
   void ProcessMouse(float xOffset, float yOffset);
 
+  glm::vec3 GetFront() const { return front; }
+  glm::vec3 GetRight() const { return right; }
+  glm::vec3 GetUp() const { return up; }
+
 private:
   glm::vec3 front = {0.0f, 0.0f, -1.0f};
   glm::vec3 up = {0.0f, 1.0f, 0.0f};

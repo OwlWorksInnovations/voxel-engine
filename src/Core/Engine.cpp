@@ -5,6 +5,7 @@
 #include "../Render/Shader.hpp"
 #include "../Render/Texture.hpp"
 #include "../World/ChunkManager.hpp"
+#include "../Entity/Player.hpp"
 #include "Input.hpp"
 #include <glad/glad.h>
 
@@ -64,7 +65,7 @@ void Engine::Run() {
   Texture texture;
   texture.load("assets/textures/Grass/Grass_01-128x128.png");
 
-  Camera camera({0.0f, 20.0f, 50.0f});
+  Player player({0.0f, 20.0f, 0.0f});
 
   float lastTime = 0.0f;
 
@@ -88,8 +89,9 @@ void Engine::Run() {
       }
     }
 
-    camera.ProcessKeyboard(deltaTime);
-    camera.ProcessMouse(Input::GetMouseDeltaX(), Input::GetMouseDeltaY());
+    player.ProcessKeyboard(deltaTime);
+    player.ProcessMouse(Input::GetMouseDeltaX(), Input::GetMouseDeltaY());
+    player.Update(deltaTime, chunkManager);
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -100,13 +102,13 @@ void Engine::Run() {
     glfwGetFramebufferSize(window, &w, &h);
     float aspect = (float)w / (float)h;
 
-    shader.SetMat4("u_view", camera.GetViewMatrix());
-    shader.SetMat4("u_projection", camera.GetProjectionMatrix(aspect));
+    shader.SetMat4("u_view", player.GetCamera().GetViewMatrix());
+    shader.SetMat4("u_projection", player.GetCamera().GetProjectionMatrix(aspect));
 
     texture.bind(0);
     shader.SetInt("u_texture", 0);
 
-    glm::mat4 viewProj = camera.GetProjectionMatrix(aspect) * camera.GetViewMatrix();
+    glm::mat4 viewProj = player.GetCamera().GetProjectionMatrix(aspect) * player.GetCamera().GetViewMatrix();
     chunkManager.Render(viewProj);
 
     glfwSwapBuffers(window);

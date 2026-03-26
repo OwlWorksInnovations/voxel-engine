@@ -46,6 +46,7 @@ add_executable(${PROJECT_NAME}
     src/Render/Camera.cpp
     src/World/Chunk.cpp
     src/World/ChunkManager.cpp
+    src/Entity/Player.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -53,6 +54,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     src/
     src/Core/
     src/Render/
+    src/Entity/
+    src/Physics/
 )
 
 # ─── Link ───────────────────────────────────────────────

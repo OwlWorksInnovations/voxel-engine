@@ -24,6 +24,8 @@ public:
     void RemoveChunk(glm::ivec3 pos);
     Chunk* GetChunk(glm::ivec3 pos);
 
+    uint8_t GetBlockAtWorldPos(glm::vec3 worldPos);
+
 private:
     std::map<glm::ivec3, std::unique_ptr<Chunk>, ChunkPosComparator> chunks;
 };

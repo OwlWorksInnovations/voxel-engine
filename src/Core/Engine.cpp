@@ -1,10 +1,16 @@
 #include "Engine.hpp"
 #include "../Render/Camera.hpp"
+#include "../Render/InstancedMesh.hpp"
 #include "../Render/Mesh.hpp"
 #include "../Render/Shader.hpp"
 #include "../Render/Texture.hpp"
+#include "../World/ChunkManager.hpp"
+#include "../Entity/Player.hpp"
 #include "Input.hpp"
 #include <glad/glad.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -39,60 +45,38 @@ void Engine::InitWindow(int width, int height, const char *title) {
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   Input::Init(window);
 
+  // Initialize ImGui
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO(); (void)io;
+  ImGui::StyleColorsDark();
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplOpenGL3_Init("#version 330");
+
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glFrontFace(GL_CCW);
 }
+
+// Global variables
+bool wireframeMode = false;
 
 void Engine::Run() {
   Shader shader("shaders/shader.vs", "shaders/shader.fs");
 
-  Mesh mesh;
-  std::vector<Vertex> vertices = {
-      // Back face
-      {-0.5f, -0.5f, -0.5f, 0.0f, 0.0f},
-      {0.5f, -0.5f, -0.5f, 1.0f, 0.0f},
-      {0.5f, 0.5f, -0.5f, 1.0f, 1.0f},
-      {-0.5f, 0.5f, -0.5f, 0.0f, 1.0f},
-      // Front face
-      {-0.5f, -0.5f, 0.5f, 0.0f, 0.0f},
-      {0.5f, -0.5f, 0.5f, 1.0f, 0.0f},
-      {0.5f, 0.5f, 0.5f, 1.0f, 1.0f},
-      {-0.5f, 0.5f, 0.5f, 0.0f, 1.0f},
-      // Left face
-      {-0.5f, -0.5f, -0.5f, 0.0f, 0.0f},
-      {-0.5f, -0.5f, 0.5f, 1.0f, 0.0f},
-      {-0.5f, 0.5f, 0.5f, 1.0f, 1.0f},
-      {-0.5f, 0.5f, -0.5f, 0.0f, 1.0f},
-      // Right face
-      {0.5f, -0.5f, 0.5f, 0.0f, 0.0f},
-      {0.5f, -0.5f, -0.5f, 1.0f, 0.0f},
-      {0.5f, 0.5f, -0.5f, 1.0f, 1.0f},
-      {0.5f, 0.5f, 0.5f, 0.0f, 1.0f},
-      // Bottom face
-      {-0.5f, -0.5f, -0.5f, 0.0f, 0.0f},
-      {0.5f, -0.5f, -0.5f, 1.0f, 0.0f},
-      {0.5f, -0.5f, 0.5f, 1.0f, 1.0f},
-      {-0.5f, -0.5f, 0.5f, 0.0f, 1.0f},
-      // Top face
-      {-0.5f, 0.5f, 0.5f, 0.0f, 0.0f},
-      {0.5f, 0.5f, 0.5f, 1.0f, 0.0f},
-      {0.5f, 0.5f, -0.5f, 1.0f, 1.0f},
-      {-0.5f, 0.5f, -0.5f, 0.0f, 1.0f},
-  };
-
-  std::vector<unsigned int> indices = {
-      0,  1,  2,  0,  2,  3,  // back
-      4,  5,  6,  4,  6,  7,  // front
-      8,  9,  10, 8,  10, 11, // left
-      12, 13, 14, 12, 14, 15, // right
-      16, 17, 18, 16, 18, 19, // bottom
-      20, 21, 22, 20, 22, 23, // top
-  };
-  mesh.SetData(vertices, indices);
+  ChunkManager chunkManager;
+  // Initialize a 4x1x4 area of chunks
+  for (int x = -2; x < 2; x++) {
+      for (int z = -2; z < 2; z++) {
+          chunkManager.AddChunk({x, 0, z});
+      }
+  }
 
   Texture texture;
-  texture.load("assets/textures/Bricks/Bricks_01-128x128.png");
+  texture.load("assets/textures/Grass/Grass_01-128x128.png");
 
-  Camera camera({0.0f, 0.0f, 3.0f});
+  Player player({0.0f, 20.0f, 0.0f});
 
   float lastTime = 0.0f;
 
@@ -106,8 +90,19 @@ void Engine::Run() {
     if (Input::IsKeyPressed(GLFW_KEY_ESCAPE))
       glfwSetWindowShouldClose(window, true);
 
-    camera.ProcessKeyboard(deltaTime);
-    camera.ProcessMouse(Input::GetMouseDeltaX(), Input::GetMouseDeltaY());
+    if (Input::IsKeyPressed(GLFW_KEY_SEMICOLON)) {
+      if (wireframeMode) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        wireframeMode = false;
+      } else if (!wireframeMode) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        wireframeMode = true;
+      }
+    }
+
+    player.ProcessKeyboard(deltaTime);
+    player.ProcessMouse(Input::GetMouseDeltaX(), Input::GetMouseDeltaY());
+    player.Update(deltaTime, chunkManager);
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -118,13 +113,27 @@ void Engine::Run() {
     glfwGetFramebufferSize(window, &w, &h);
     float aspect = (float)w / (float)h;
 
-    shader.SetMat4("u_model", glm::mat4(1.0f));
-    shader.SetMat4("u_view", camera.GetViewMatrix());
-    shader.SetMat4("u_projection", camera.GetProjectionMatrix(aspect));
+    shader.SetMat4("u_view", player.GetCamera().GetViewMatrix());
+    shader.SetMat4("u_projection", player.GetCamera().GetProjectionMatrix(aspect));
 
     texture.bind(0);
     shader.SetInt("u_texture", 0);
-    mesh.Draw();
+
+    glm::mat4 viewProj = player.GetCamera().GetProjectionMatrix(aspect) * player.GetCamera().GetViewMatrix();
+    chunkManager.Render(viewProj);
+
+    // Draw Crosshair using ImGui
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImVec2 center = ImVec2((float)w * 0.5f, (float)h * 0.5f);
+    ImGui::GetBackgroundDrawList()->AddCircle(center, 5.0f, IM_COL32(255, 255, 255, 200), 16, 2.0f);
+    ImGui::GetBackgroundDrawList()->AddLine(ImVec2(center.x - 10, center.y), ImVec2(center.x + 10, center.y), IM_COL32(255, 255, 255, 200), 2.0f);
+    ImGui::GetBackgroundDrawList()->AddLine(ImVec2(center.x, center.y - 10), ImVec2(center.x, center.y + 10), IM_COL32(255, 255, 255, 200), 2.0f);
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
   }

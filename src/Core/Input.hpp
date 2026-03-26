@@ -18,6 +18,8 @@ public:
   static bool IsKeyPressed(int key);
   static bool IsKeyHeld(int key);
   static bool IsKeyReleased(int key);
+  static bool IsMouseButtonPressed(int button);
+  static bool IsMouseButtonHeld(int button);
   static float GetMouseDeltaX();
   static float GetMouseDeltaY();
 

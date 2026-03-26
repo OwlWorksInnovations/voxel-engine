@@ -44,6 +44,8 @@ add_executable(${PROJECT_NAME}
     src/Render/InstancedMesh.cpp
     src/Render/Texture.cpp
     src/Render/Camera.cpp
+    src/World/Chunk.cpp
+    src/World/ChunkManager.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
